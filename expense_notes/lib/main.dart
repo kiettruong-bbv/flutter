@@ -20,7 +20,17 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatelessWidget {
-  final List<Product> items = [Product(100, 'Iphone'), Product(20, 'Shoes')];
+  final List<Product> items = [
+    Product(100, 'Iphone'),
+    Product(20, 'Shoes'),
+    Product(20, 'Shoes'),
+    Product(20, 'Shoes'),
+    Product(20, 'Shoes'),
+    Product(20, 'Shoes'),
+    Product(20, 'Shoes'),
+    Product(20, 'Shoes'),
+    Product(20, 'Shoes')
+  ];
 
   HomePage({Key? key}) : super(key: key);
 
@@ -28,43 +38,22 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Assignment week 1'),
+        title: const Text('Expense Notes'),
+        backgroundColor: Color.fromARGB(255, 137, 100, 202),
+        centerTitle: false,
       ),
-      body: Container(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              flex: 1,
-              child: _buildNote(),
-            ),
-            Expanded(
-              flex: 2,
-              child: _buildChart(),
-            ),
-            Expanded(
-              flex: 4,
-              child: _buildTransactionList(),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNote() {
-    return Container(
-      color: const Color.fromARGB(255, 138, 109, 187),
-      padding: const EdgeInsets.all(10),
-      child: const Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          "Expense Notes",
-          style: TextStyle(
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 2,
+            child: _buildChart(),
           ),
-        ),
+          Expanded(
+            flex: 4,
+            child: _buildTransactionList(),
+          )
+        ],
       ),
     );
   }
@@ -156,7 +145,7 @@ class HomePage extends StatelessWidget {
 }
 
 class Product {
-  int price;
-  String name;
+  final int price;
+  final String name;
   Product(this.price, this.name);
 }
