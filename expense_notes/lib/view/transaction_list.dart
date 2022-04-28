@@ -1,6 +1,9 @@
+import 'package:expense_notes/view/transaction_item.dart';
+import 'package:expense_notes/widget/chart.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:expense_notes/model/product.dart';
-import 'package:expense_notes/view/add_product_screen.dart';
+import 'package:expense_notes/model/transaction.dart';
+import 'package:expense_notes/view/add_transaction_screen.dart';
 
 class TransactionList extends StatefulWidget {
   const TransactionList({Key? key}) : super(key: key);
@@ -10,7 +13,19 @@ class TransactionList extends StatefulWidget {
 }
 
 class _TransactionListState extends State<TransactionList> {
-  List<Product> products = [];
+  final List<Transaction> _transactions = [];
+
+  final List<DayTransaction> _weekDayTransactions = [
+    DayTransaction(weekDay: WeekDay.mon, transactions: []),
+    DayTransaction(weekDay: WeekDay.tue, transactions: []),
+    DayTransaction(weekDay: WeekDay.wed, transactions: []),
+    DayTransaction(weekDay: WeekDay.thu, transactions: []),
+    DayTransaction(weekDay: WeekDay.fri, transactions: []),
+    DayTransaction(weekDay: WeekDay.sat, transactions: []),
+    DayTransaction(weekDay: WeekDay.sun, transactions: []),
+  ];
+
+  List<BarChartGroupData> _chartData = [];
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +37,7 @@ class _TransactionListState extends State<TransactionList> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showModalBottomSheet<Product>(
+          showModalBottomSheet<Transaction>(
             context: context,
             isScrollControlled: true,
             builder: (BuildContext context) {
@@ -30,14 +45,16 @@ class _TransactionListState extends State<TransactionList> {
                 padding: MediaQuery.of(context).viewInsets,
                 child: SizedBox(
                   height: screenHeight / 2,
-                  child: const AddProductScreen(),
+                  child: const AddTransactionScreen(),
                 ),
               );
             },
           ).then((value) {
             if (value != null) {
               setState(() {
-                products.add(value);
+                _transactions.add(value);
+                _addChartData(value);
+                _updateChart();
               });
             }
           });
@@ -48,7 +65,7 @@ class _TransactionListState extends State<TransactionList> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            flex: 2,
+            flex: 3,
             child: _buildChart(),
           ),
           Expanded(
@@ -61,6 +78,17 @@ class _TransactionListState extends State<TransactionList> {
   }
 
   Widget _buildChart() {
+    Widget chart = (_chartData.isEmpty)
+        ? const Center(
+            child: Text(
+              'CHART',
+              style: TextStyle(color: Colors.white),
+            ),
+          )
+        : MyBarChart(
+            barGroups: _chartData,
+          );
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -74,12 +102,13 @@ class _TransactionListState extends State<TransactionList> {
         ],
       ),
       margin: const EdgeInsets.all(20),
-      child: const Center(
-        child: Text(
-          "Chart",
-          style: TextStyle(
-            fontSize: 25,
-          ),
+      child: AspectRatio(
+        aspectRatio: 1,
+        child: Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          color: const Color(0xff2c4260),
+          child: chart,
         ),
       ),
     );
@@ -112,17 +141,22 @@ class _TransactionListState extends State<TransactionList> {
   }
 
   Widget _buildList() {
-    if (products.isEmpty) {
+    if (_transactions.isEmpty) {
       return const Center(
         child: Text('No transactions added yet!'),
       );
     }
 
     return ListView.separated(
-      itemCount: products.length,
+      itemCount: _transactions.length,
       itemBuilder: (context, index) {
-        final item = products[index];
-        return _buildListItem(index, item);
+        final item = _transactions[index];
+        return TransactionItem(
+          key: UniqueKey(),
+          index: index,
+          product: item,
+          onDelete: (index) => _removeItem(index),
+        );
       },
       separatorBuilder: (context, index) {
         return const SizedBox(
@@ -132,84 +166,37 @@ class _TransactionListState extends State<TransactionList> {
     );
   }
 
-  Widget _buildListItem(int index, Product product) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 1,
-            blurRadius: 1,
-            offset: const Offset(1, 1),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.blueAccent,
-                width: 3,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                '\$${product.price}',
-                style: const TextStyle(
-                  color: Colors.blueAccent,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                Text(
-                  product.addTime,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            width: 40,
-            child: IconButton(
-              onPressed: () => removeItem(index),
-              icon: const Icon(
-                Icons.delete,
-                color: Colors.red,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  void _removeItem(int index) {
+    setState(() {
+      _transactions.removeAt(index);
+    });
   }
 
-  void removeItem(int index) {
-    setState(() {
-      products.removeAt(index);
-    });
+  void _addChartData(Transaction transaction) {
+    DateTime today = DateTime.now();
+    DateTime day7FromToday = DateTime(today.year, today.month, today.day - 8);
+
+    if (transaction.addTime.isAfter(day7FromToday) &&
+        transaction.addTime.isBefore(today)) {
+      int weekDay = transaction.addTime.weekday;
+      _weekDayTransactions[weekDay].transactions.add(transaction);
+    }
+  }
+
+  void _updateChart() {
+    _chartData = _weekDayTransactions.asMap().entries.map((entry) {
+      int index = entry.key;
+      DayTransaction trans = entry.value;
+      double toY =
+          (trans.transactions.length / _weekDayTransactions.length) * 10;
+      return BarChartGroupData(
+        x: index,
+        barRods: [
+          BarChartRodData(
+            toY: toY,
+          )
+        ],
+      );
+    }).toList();
   }
 }
