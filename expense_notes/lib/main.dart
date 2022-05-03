@@ -1,4 +1,4 @@
-import 'package:expense_notes/style/config.dart';
+import 'package:expense_notes/style/theme_config.dart';
 import 'package:expense_notes/style/custom_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/view/transaction_list.dart';

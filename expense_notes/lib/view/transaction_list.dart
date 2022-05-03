@@ -1,5 +1,5 @@
 import 'package:expense_notes/extension/platform_extension.dart';
-import 'package:expense_notes/style/config.dart';
+import 'package:expense_notes/style/theme_config.dart';
 import 'package:expense_notes/view/transaction_item.dart';
 import 'package:expense_notes/widget/chart.dart';
 import 'package:fl_chart/fl_chart.dart';

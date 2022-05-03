@@ -55,7 +55,7 @@ class CustomTheme with ChangeNotifier {
       fontFamily: 'Montserrat',
       textTheme: ThemeData.dark().textTheme.copyWith(
             button: const TextStyle(
-              color: CustomColors.grey,
+              color: CustomColors.white,
             ),
           ),
       buttonTheme: ButtonThemeData(
