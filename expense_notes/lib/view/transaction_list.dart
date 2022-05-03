@@ -1,9 +1,11 @@
+import 'package:expense_notes/extension/platform_extension.dart';
+import 'package:expense_notes/style/config.dart';
 import 'package:expense_notes/view/transaction_item.dart';
 import 'package:expense_notes/widget/chart.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/transaction.dart';
-import 'package:expense_notes/view/add_transaction_screen.dart';
+import 'package:expense_notes/view/add_transaction.dart';
 
 class TransactionList extends StatefulWidget {
   const TransactionList({Key? key}) : super(key: key);
@@ -29,38 +31,32 @@ class _TransactionListState extends State<TransactionList> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    final ThemeData theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Assignment week 2'),
+        title: const Text('Transaction List'),
+        backgroundColor: theme.primaryColor,
+        leading: IconButton(
+          onPressed: () => currentTheme.toggleTheme(),
+          icon: const Icon(Icons.brightness_4),
+        ),
+        actions: [
+          if (isIOS())
+            TextButton(
+              style: theme.textButtonTheme.style,
+              onPressed: () => _openAddTransaction(),
+              child: const Text('ADD'),
+            ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet<Transaction>(
-            context: context,
-            isScrollControlled: true,
-            builder: (BuildContext context) {
-              return Padding(
-                padding: MediaQuery.of(context).viewInsets,
-                child: SizedBox(
-                  height: screenHeight / 2,
-                  child: const AddTransactionScreen(),
-                ),
-              );
-            },
-          ).then((value) {
-            if (value != null) {
-              setState(() {
-                _transactions.add(value);
-                _addChartData(value);
-                _updateChart();
-              });
-            }
-          });
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: isAndroid()
+          ? FloatingActionButton(
+              onPressed: () => _openAddTransaction(),
+              child: const Icon(Icons.add),
+            )
+          : null,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -70,7 +66,7 @@ class _TransactionListState extends State<TransactionList> {
           ),
           Expanded(
             flex: 5,
-            child: _buildListContainer(),
+            child: _buildListContainer(context),
           )
         ],
       ),
@@ -81,7 +77,7 @@ class _TransactionListState extends State<TransactionList> {
     Widget chart = (_chartData.isEmpty)
         ? const Center(
             child: Text(
-              'CHART',
+              'Add transaction to display chart.',
               style: TextStyle(color: Colors.white),
             ),
           )
@@ -114,9 +110,9 @@ class _TransactionListState extends State<TransactionList> {
     );
   }
 
-  Widget _buildListContainer() {
+  Widget _buildListContainer(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).backgroundColor,
       padding: const EdgeInsets.symmetric(
         vertical: 10,
         horizontal: 20,
@@ -198,5 +194,30 @@ class _TransactionListState extends State<TransactionList> {
         ],
       );
     }).toList();
+  }
+
+  void _openAddTransaction() {
+    final screenHeight = MediaQuery.of(context).size.height;
+    showModalBottomSheet<Transaction>(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: SizedBox(
+            height: screenHeight / 2,
+            child: const AddTransaction(),
+          ),
+        );
+      },
+    ).then((value) {
+      if (value != null) {
+        setState(() {
+          _transactions.add(value);
+          _addChartData(value);
+          _updateChart();
+        });
+      }
+    });
   }
 }
