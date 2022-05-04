@@ -1,4 +1,3 @@
-import 'package:expense_notes/style/custom_colors.dart';
 import 'package:expense_notes/widget/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/transaction.dart';
@@ -55,9 +54,9 @@ class _AddTransactionState extends State<AddTransaction> {
               const Spacer(),
               IconButton(
                 onPressed: () => Navigator.pop(context),
-                icon: const Icon(
+                icon: Icon(
                   Icons.close,
-                  color: CustomColors.white,
+                  color: theme.colorScheme.secondary,
                 ),
               ),
             ],
@@ -119,6 +118,7 @@ class _AddTransactionState extends State<AddTransaction> {
           ),
           const Spacer(),
           SizedBox(
+            width: double.infinity,
             height: 44,
             child: CustomButton(
               onPressed: _isAddEnable ? _addProduct : null,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'custom_colors.dart';
 
 class CustomTheme with ChangeNotifier {
-  static bool _isDarkTheme = true;
+  static bool _isDarkTheme = false;
   ThemeMode get currentTheme => _isDarkTheme ? ThemeMode.dark : ThemeMode.light;
 
   void toggleTheme() {
@@ -18,7 +18,7 @@ class CustomTheme with ChangeNotifier {
       fontFamily: 'Montserrat',
       textTheme: ThemeData.light().textTheme.copyWith(
             button: const TextStyle(
-              color: CustomColors.black,
+              color: CustomColors.white,
             ),
           ),
       buttonTheme: ButtonThemeData(
