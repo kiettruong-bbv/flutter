@@ -112,7 +112,7 @@ class _TransactionListState extends State<TransactionList> {
 
   Widget _buildListContainer(BuildContext context) {
     return Container(
-      color: Theme.of(context).backgroundColor,
+      color: Theme.of(context).scaffoldBackgroundColor,
       padding: const EdgeInsets.symmetric(
         vertical: 10,
         horizontal: 20,
@@ -162,9 +162,19 @@ class _TransactionListState extends State<TransactionList> {
     );
   }
 
+  void _addItem(Transaction transaction) {
+    setState(() {
+      _transactions.add(transaction);
+      _addChartData(transaction);
+      _updateChartUI();
+    });
+  }
+
   void _removeItem(int index) {
     setState(() {
-      _transactions.removeAt(index);
+      Transaction removedTransaction = _transactions.removeAt(index);
+      _removeChartData(removedTransaction);
+      _updateChartUI();
     });
   }
 
@@ -174,12 +184,20 @@ class _TransactionListState extends State<TransactionList> {
 
     if (transaction.addTime.isAfter(day7FromToday) &&
         transaction.addTime.isBefore(today)) {
-      int weekDay = transaction.addTime.weekday;
+      int weekDay = transaction.addTime.weekday - 1;
       _weekDayTransactions[weekDay].transactions.add(transaction);
     }
   }
 
-  void _updateChart() {
+  void _removeChartData(Transaction transaction) {
+    int weekDay = transaction.addTime.weekday - 1;
+
+    _weekDayTransactions[weekDay]
+        .transactions
+        .removeWhere((element) => element.id == transaction.id);
+  }
+
+  void _updateChartUI() {
     _chartData = _weekDayTransactions.asMap().entries.map((entry) {
       int index = entry.key;
       DayTransaction trans = entry.value;
@@ -212,11 +230,7 @@ class _TransactionListState extends State<TransactionList> {
       },
     ).then((value) {
       if (value != null) {
-        setState(() {
-          _transactions.add(value);
-          _addChartData(value);
-          _updateChart();
-        });
+        _addItem(value);
       }
     });
   }

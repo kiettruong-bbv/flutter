@@ -111,7 +111,7 @@ class _AddTransactionState extends State<AddTransaction> {
           ),
           space15,
           DateTimeInput(
-            onSelectDateTime: (dateTime) {
+            onDateTimeSelected: (dateTime) {
               if (dateTime != null) {
                 _selectedDate = dateTime;
               }

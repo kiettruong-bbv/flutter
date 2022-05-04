@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
+
 enum WeekDay { mon, tue, wed, thu, fri, sat, sun }
 
 class Transaction {
+  late final String id;
   final String name;
   final double price;
   final DateTime addTime;
@@ -9,7 +12,9 @@ class Transaction {
     required this.name,
     required this.price,
     required this.addTime,
-  });
+  }) {
+    id = DateTime.now().millisecondsSinceEpoch.toString();
+  }
 }
 
 class DayTransaction {

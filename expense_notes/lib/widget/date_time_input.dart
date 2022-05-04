@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 typedef DatePickerCallback = Function(DateTime? dateTime);
 
 class DateTimeInput extends StatefulWidget {
-  final DatePickerCallback? onSelectDateTime;
+  final DatePickerCallback? onDateTimeSelected;
 
   const DateTimeInput({
     Key? key,
-    this.onSelectDateTime,
+    this.onDateTimeSelected,
   }) : super(key: key);
 
   @override
@@ -66,7 +66,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
-        widget.onSelectDateTime?.call(picked);
+        widget.onDateTimeSelected?.call(picked);
       });
     }
   }
@@ -87,6 +87,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
                 onDateTimeChanged: (picked) {
                   setState(() {
                     selectedDate = picked;
+                    widget.onDateTimeSelected?.call(picked);
                   });
                 },
               ),
