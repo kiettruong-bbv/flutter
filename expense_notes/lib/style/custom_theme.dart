@@ -13,6 +13,7 @@ class CustomTheme with ChangeNotifier {
   static ThemeData get lightTheme {
     return ThemeData(
       primaryColor: CustomColors.purple,
+      primaryColorLight: CustomColors.white,
       backgroundColor: CustomColors.white,
       scaffoldBackgroundColor: CustomColors.white,
       fontFamily: 'Montserrat',
@@ -50,6 +51,7 @@ class CustomTheme with ChangeNotifier {
   static ThemeData get darkTheme {
     return ThemeData(
       primaryColor: CustomColors.purple,
+      primaryColorLight: CustomColors.white,
       backgroundColor: CustomColors.darkGrey,
       scaffoldBackgroundColor: CustomColors.black,
       fontFamily: 'Montserrat',
