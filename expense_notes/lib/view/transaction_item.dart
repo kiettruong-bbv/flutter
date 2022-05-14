@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 typedef OnDeleteItemCallBack = Function(int index);
 
 class TransactionItem extends StatelessWidget {
-  TransactionItem({
+  const TransactionItem({
     Key? key,
     required this.index,
     required this.product,
@@ -19,14 +19,12 @@ class TransactionItem extends StatelessWidget {
   final VoidCallback onTap;
   final OnDeleteItemCallBack onDelete;
 
-  late final Color randomColor = generateRandomColor();
-
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => onTap,
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -47,7 +45,7 @@ class TransactionItem extends StatelessWidget {
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: randomColor,
+                  color: product.color,
                   width: 3,
                 ),
               ),
@@ -55,7 +53,7 @@ class TransactionItem extends StatelessWidget {
                 child: Text(
                   '\$${product.price}',
                   style: TextStyle(
-                    color: randomColor,
+                    color: product.color,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
@@ -86,7 +84,7 @@ class TransactionItem extends StatelessWidget {
             SizedBox(
               width: 40,
               child: IconButton(
-                onPressed: onDelete(index),
+                onPressed: () => onDelete(index),
                 icon: const Icon(
                   Icons.delete,
                   color: Colors.red,

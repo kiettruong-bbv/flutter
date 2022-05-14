@@ -1,11 +1,20 @@
+import 'package:expense_notes/model/transaction_model.dart';
 import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/style/theme_config.dart';
 import 'package:expense_notes/style/custom_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/view/home_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => TransactionModel()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {

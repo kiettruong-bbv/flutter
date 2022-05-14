@@ -1,13 +1,14 @@
 import 'package:expense_notes/extension/platform_extension.dart';
+import 'package:expense_notes/model/transaction_model.dart';
 import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/view/detail_screen.dart';
 import 'package:expense_notes/view/transaction_item.dart';
-import 'package:expense_notes/widget/app_drawer.dart';
 import 'package:expense_notes/widget/chart.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/transaction.dart';
 import 'package:expense_notes/view/add_transaction.dart';
+import 'package:provider/provider.dart';
 
 class TransactionListScreen extends StatefulWidget {
   const TransactionListScreen({Key? key}) : super(key: key);
@@ -17,19 +18,28 @@ class TransactionListScreen extends StatefulWidget {
 }
 
 class _TransactionListScreenState extends State<TransactionListScreen> {
-  final List<Transaction> _transactions = [];
-
-  final List<DayTransaction> _weekDayTransactions = [
-    DayTransaction(weekDay: WeekDay.mon, transactions: []),
-    DayTransaction(weekDay: WeekDay.tue, transactions: []),
-    DayTransaction(weekDay: WeekDay.wed, transactions: []),
-    DayTransaction(weekDay: WeekDay.thu, transactions: []),
-    DayTransaction(weekDay: WeekDay.fri, transactions: []),
-    DayTransaction(weekDay: WeekDay.sat, transactions: []),
-    DayTransaction(weekDay: WeekDay.sun, transactions: []),
+  List<WeekDayTransaction> _weekDayDatas = [
+    WeekDayTransaction(weekDay: WeekDay.mon, transactions: []),
+    WeekDayTransaction(weekDay: WeekDay.tue, transactions: []),
+    WeekDayTransaction(weekDay: WeekDay.wed, transactions: []),
+    WeekDayTransaction(weekDay: WeekDay.thu, transactions: []),
+    WeekDayTransaction(weekDay: WeekDay.fri, transactions: []),
+    WeekDayTransaction(weekDay: WeekDay.sat, transactions: []),
+    WeekDayTransaction(weekDay: WeekDay.sun, transactions: []),
   ];
 
   List<BarChartGroupData> _chartData = [];
+
+  @override
+  void initState() {
+    _setupWeekDayTransactions();
+
+    for (var data in _weekDayDatas) {
+      print(data.weekDay);
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +50,6 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
       appBar: AppBar(
         title: const Text('Transaction List'),
         backgroundColor: theme.primaryColor,
-        // leading: IconButton(
-        //   onPressed: () => currentTheme.toggleTheme(),
-        //   icon: const Icon(Icons.brightness_4),
-        // ),
         actions: [
           if (isIOS())
             TextButton(
@@ -139,81 +145,111 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
   }
 
   Widget _buildList() {
-    if (_transactions.isEmpty) {
-      return const Center(
-        child: Text('No transactions added yet!'),
-      );
-    }
+    return Consumer<TransactionModel>(
+      builder: (context, model, child) {
+        List<Transaction> transactions = model.transactions;
 
-    return ListView.separated(
-      itemCount: _transactions.length,
-      itemBuilder: (context, index) {
-        final item = _transactions[index];
-        return TransactionItem(
-          key: UniqueKey(),
-          index: index,
-          product: item,
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              Routes.DETAIL_SCREEN,
-              arguments: DetailScreenArguments(item),
+        if (transactions.isEmpty) {
+          return const Center(
+            child: Text('No transactions added yet!'),
+          );
+        }
+
+        return ListView.separated(
+          itemCount: transactions.length,
+          itemBuilder: (context, index) {
+            final item = transactions[index];
+            return TransactionItem(
+              key: UniqueKey(),
+              index: index,
+              product: item,
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  Routes.DETAIL_SCREEN,
+                  arguments: DetailScreenArguments(item),
+                );
+              },
+              onDelete: (index) => _removeItem(index),
             );
           },
-          onDelete: (index) => _removeItem(index),
-        );
-      },
-      separatorBuilder: (context, index) {
-        return const SizedBox(
-          height: 15,
+          separatorBuilder: (context, index) {
+            return const SizedBox(
+              height: 15,
+            );
+          },
         );
       },
     );
   }
 
+  void _setupWeekDayTransactions() {
+    int todayWeekDay = DateTime.now().weekday;
+
+    if (todayWeekDay == WeekDay.sun.value) {
+      return;
+    }
+    int todayData = _weekDayDatas
+        .indexWhere((element) => element.weekDay.value == todayWeekDay);
+
+    // Get all weekday data after today
+    List<WeekDayTransaction> weekDayDataAfterToday =
+        _weekDayDatas.sublist(todayData + 1);
+
+    // Remove after-today data of current data list
+    _weekDayDatas.length = _weekDayDatas.length - weekDayDataAfterToday.length;
+
+    // Append to beginning of weekday data
+    _weekDayDatas = weekDayDataAfterToday + _weekDayDatas;
+  }
+
   void _addItem(Transaction transaction) {
-    setState(() {
-      _transactions.add(transaction);
-      _addChartData(transaction);
-      _updateChartUI();
-    });
+    TransactionModel model =
+        Provider.of<TransactionModel>(context, listen: false);
+    model.add(transaction);
+    _addChartData(transaction);
+    _updateChartUI();
   }
 
   void _removeItem(int index) {
-    setState(() {
-      Transaction removedTransaction = _transactions.removeAt(index);
-      _removeChartData(removedTransaction);
-      _updateChartUI();
-    });
+    TransactionModel model =
+        Provider.of<TransactionModel>(context, listen: false);
+    Transaction removedTransaction = model.remove(index);
+    _removeChartData(removedTransaction);
+    _updateChartUI();
   }
 
   void _addChartData(Transaction transaction) {
     DateTime today = DateTime.now();
-    DateTime day7FromToday = DateTime(today.year, today.month, today.day - 8);
+    DateTime day6FromToday = DateTime(today.year, today.month, today.day - 7);
 
-    if (transaction.addTime.isAfter(day7FromToday) &&
+    print('weekday => ${transaction.addTime.weekday}');
+
+    if (transaction.addTime.isAfter(day6FromToday) &&
         transaction.addTime.isBefore(today)) {
-      int weekDay = transaction.addTime.weekday - 1;
-      _weekDayTransactions[weekDay].transactions.add(transaction);
+      int weekDay = transaction.addTime.weekday;
+      int weekDayIndex = _weekDayDatas
+          .indexWhere((element) => element.weekDay.value == weekDay);
+
+      _weekDayDatas[weekDayIndex].transactions.add(transaction);
     }
   }
 
   void _removeChartData(Transaction transaction) {
     int weekDay = transaction.addTime.weekday - 1;
 
-    _weekDayTransactions[weekDay]
+    _weekDayDatas[weekDay]
         .transactions
         .removeWhere((element) => element.id == transaction.id);
   }
 
   void _updateChartUI() {
-    _chartData = _weekDayTransactions.asMap().entries.map((entry) {
+    _chartData = _weekDayDatas.asMap().entries.map((entry) {
       int index = entry.key;
-      DayTransaction trans = entry.value;
-      double toY =
-          (trans.transactions.length / _weekDayTransactions.length) * 10;
+      WeekDayTransaction trans = entry.value;
+      double toY = (trans.transactions.length / _weekDayDatas.length) * 10;
       return BarChartGroupData(
-        x: index,
+        x: trans.weekDay.value - 1,
         barRods: [
           BarChartRodData(
             toY: toY,

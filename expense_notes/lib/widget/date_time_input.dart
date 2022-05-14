@@ -57,12 +57,13 @@ class _DateTimeInputState extends State<DateTimeInput> {
     );
   }
 
-  Future<void> _showDatePickerAndroid(BuildContext context) async {
+  Future _showDatePickerAndroid(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2020, 8),
-        lastDate: DateTime(2100));
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2020, 8),
+      lastDate: DateTime.now(),
+    );
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
@@ -84,6 +85,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
               child: CupertinoDatePicker(
                 mode: CupertinoDatePickerMode.date,
                 initialDateTime: DateTime.now(),
+                maximumDate: DateTime.now(),
                 onDateTimeChanged: (picked) {
                   setState(() {
                     selectedDate = picked;
