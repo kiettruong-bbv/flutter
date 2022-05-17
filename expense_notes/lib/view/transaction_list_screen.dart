@@ -5,6 +5,7 @@ import 'package:expense_notes/view/detail_screen.dart';
 import 'package:expense_notes/view/transaction_item.dart';
 import 'package:expense_notes/widget/chart.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/transaction.dart';
 import 'package:expense_notes/view/add_transaction.dart';
@@ -33,20 +34,20 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
   @override
   void initState() {
     _setupWeekDayTransactions();
-
-    for (var data in _weekDayDatas) {
-      print(data.weekDay);
-    }
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
+    final cupertinoThemeData = CupertinoTheme.of(context);
+
+    Color backgroundColor = isIOS()
+        ? cupertinoThemeData.scaffoldBackgroundColor
+        : theme.scaffoldBackgroundColor;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: const Text('Transaction List'),
         backgroundColor: theme.primaryColor,
@@ -216,14 +217,15 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
         Provider.of<TransactionModel>(context, listen: false);
     Transaction removedTransaction = model.remove(index);
     _removeChartData(removedTransaction);
-    _updateChartUI();
+
+    setState(() {
+      _updateChartUI();
+    });
   }
 
   void _addChartData(Transaction transaction) {
     DateTime today = DateTime.now();
     DateTime day6FromToday = DateTime(today.year, today.month, today.day - 7);
-
-    print('weekday => ${transaction.addTime.weekday}');
 
     if (transaction.addTime.isAfter(day6FromToday) &&
         transaction.addTime.isBefore(today)) {
@@ -236,16 +238,16 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
   }
 
   void _removeChartData(Transaction transaction) {
-    int weekDay = transaction.addTime.weekday - 1;
-
-    _weekDayDatas[weekDay]
+    int weekDay = transaction.addTime.weekday;
+    int weekDayIndex =
+        _weekDayDatas.indexWhere((element) => element.weekDay.value == weekDay);
+    _weekDayDatas[weekDayIndex]
         .transactions
         .removeWhere((element) => element.id == transaction.id);
   }
 
   void _updateChartUI() {
     _chartData = _weekDayDatas.asMap().entries.map((entry) {
-      int index = entry.key;
       WeekDayTransaction trans = entry.value;
       double toY = (trans.transactions.length / _weekDayDatas.length) * 10;
       return BarChartGroupData(

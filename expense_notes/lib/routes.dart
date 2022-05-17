@@ -1,7 +1,5 @@
 // ignore_for_file: constant_identifier_names
 
-import 'package:expense_notes/main.dart';
-import 'package:expense_notes/model/transaction.dart';
 import 'package:expense_notes/view/detail_screen.dart';
 import 'package:expense_notes/view/home_screen.dart';
 import 'package:expense_notes/view/setting_screen.dart';

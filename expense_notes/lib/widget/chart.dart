@@ -56,25 +56,25 @@ class MyBarChart extends StatelessWidget {
     String text;
     switch (value.toInt()) {
       case 0:
-        text = 'Mn';
+        text = '2';
         break;
       case 1:
-        text = 'Te';
+        text = '3';
         break;
       case 2:
-        text = 'Wd';
+        text = '4';
         break;
       case 3:
-        text = 'Tu';
+        text = '5';
         break;
       case 4:
-        text = 'Fr';
+        text = '6';
         break;
       case 5:
-        text = 'St';
+        text = '7';
         break;
       case 6:
-        text = 'Sn';
+        text = 'CN';
         break;
       default:
         text = '';

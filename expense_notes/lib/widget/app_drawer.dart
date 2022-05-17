@@ -1,60 +1,80 @@
+import 'package:expense_notes/extension/platform_extension.dart';
 import 'package:expense_notes/routes.dart';
+import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+enum Section { home, settings }
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    PlatformTheme theme = PlatformTheme.instance;
+    Color primaryColor = theme.getPrimaryColor(context);
+    Color backgroundColor = theme.getBackgroundAccentColor(context);
+    TextStyle? defaultTextStyle = theme.getDefaultTextStyle(context);
+    TextStyle? drawerTitle = theme.getDrawerTextStyle(context);
 
     return Drawer(
+      backgroundColor: backgroundColor,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              color: theme.primaryColor,
+              color: primaryColor,
             ),
             child: Center(
               child: Text(
                 'Expense Notes',
-                style: theme.textTheme.headline5
-                    ?.apply(color: theme.primaryColorLight),
+                style: drawerTitle,
               ),
             ),
           ),
           _buildDrawerItem(
-            context,
+            textStyle: defaultTextStyle,
             title: 'Home',
-            onTap: () =>
-                {Navigator.pushNamed(context, Routes.TRANSACTION_LIST_SCREEN)},
+            onTap: () => _navigateToSection(context, Section.home),
           ),
           _buildDrawerItem(
-            context,
+            textStyle: defaultTextStyle,
             title: 'Settings',
-            onTap: () => {Navigator.pushNamed(context, Routes.SETTING_SCREEN)},
+            onTap: () => _navigateToSection(context, Section.settings),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDrawerItem(
-    BuildContext context, {
+  Widget _buildDrawerItem({
+    TextStyle? textStyle,
     required String title,
     required VoidCallback onTap,
   }) {
-    final ThemeData theme = Theme.of(context);
-
     return ListTile(
-      title: Text(
-        title,
-        style: theme.textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.bold,
+      title: Center(
+        child: Text(
+          title,
+          style: textStyle,
         ),
       ),
       onTap: onTap,
     );
+  }
+
+  void _navigateToSection(BuildContext context, Section section) {
+    // Close drawer
+    Navigator.pop(context);
+
+    switch (section) {
+      case Section.home:
+        Navigator.pushNamed(context, Routes.TRANSACTION_LIST_SCREEN);
+        break;
+      case Section.settings:
+        Navigator.pushNamed(context, Routes.SETTING_SCREEN);
+        break;
+    }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
 
 class SettingScreen extends StatelessWidget {
@@ -5,15 +6,18 @@ class SettingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    PlatformTheme theme = PlatformTheme.instance;
 
     return Scaffold(
+      backgroundColor: theme.getBackgroundColor(context),
       appBar: AppBar(
-        title: const Text('Setting'),
-        backgroundColor: theme.primaryColor,
+        title: const Text('Settings'),
       ),
-      body: const Center(
-        child: Text('SETTING'),
+      body: Center(
+        child: Text(
+          'SETTINGS',
+          style: theme.getDefaultTextStyle(context),
+        ),
       ),
     );
   }

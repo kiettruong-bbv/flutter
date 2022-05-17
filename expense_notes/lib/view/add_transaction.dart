@@ -1,4 +1,4 @@
-import 'package:expense_notes/widget/custom_button.dart';
+import 'package:expense_notes/widget/platform_widget/platform_button.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/transaction.dart';
 import 'package:expense_notes/widget/date_time_input.dart';
@@ -120,7 +120,7 @@ class _AddTransactionState extends State<AddTransaction> {
           SizedBox(
             width: double.infinity,
             height: 44,
-            child: CustomButton(
+            child: PlatformButton(
               onPressed: _isAddEnable ? _addProduct : null,
               child: Text(
                 'ADD',
