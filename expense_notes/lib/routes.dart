@@ -26,7 +26,7 @@ class Routes {
               args: settings.arguments as DetailScreenArguments,
             );
           case SETTING_SCREEN:
-            return const SettingScreen();
+            return SettingScreen();
         }
 
         return const Scaffold();

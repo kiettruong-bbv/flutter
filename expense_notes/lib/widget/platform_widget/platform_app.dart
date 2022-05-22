@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 
 class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
   final Routes routes;
+  final ThemeMode themeMode;
 
   const PlatformApp({
     Key? key,
     required this.routes,
+    required this.themeMode,
   }) : super(key: key);
 
   @override
@@ -22,7 +24,7 @@ class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
       ),
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       initialRoute: Routes.ROOT,
       onGenerateRoute: (settings) => routes.routePage(settings),
       home: const TransactionListScreen(),
