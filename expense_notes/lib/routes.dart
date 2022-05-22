@@ -1,7 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:expense_notes/view/detail_screen.dart';
-import 'package:expense_notes/view/home_screen.dart';
 import 'package:expense_notes/view/setting_screen.dart';
 import 'package:expense_notes/view/transaction_list_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,7 +18,7 @@ class Routes {
       builder: (BuildContext context) {
         switch (settings.name) {
           case ROOT:
-            return const HomeScreen();
+            return const TransactionListScreen();
           case TRANSACTION_LIST_SCREEN:
             return const TransactionListScreen();
           case DETAIL_SCREEN:

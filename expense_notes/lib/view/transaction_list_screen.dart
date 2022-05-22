@@ -1,11 +1,10 @@
 import 'package:expense_notes/extension/platform_extension.dart';
 import 'package:expense_notes/model/transaction_model.dart';
-import 'package:expense_notes/routes.dart';
-import 'package:expense_notes/view/detail_screen.dart';
 import 'package:expense_notes/view/transaction_item.dart';
+import 'package:expense_notes/widget/app_drawer.dart';
 import 'package:expense_notes/widget/chart.dart';
+import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/transaction.dart';
 import 'package:expense_notes/view/add_transaction.dart';
@@ -39,22 +38,17 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cupertinoThemeData = CupertinoTheme.of(context);
-
-    Color backgroundColor = isIOS()
-        ? cupertinoThemeData.scaffoldBackgroundColor
-        : theme.scaffoldBackgroundColor;
+    PlatformTheme theme = PlatformTheme(context);
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: theme.getBackgroundColor(),
+      drawer: const AppDrawer(current: Section.home),
       appBar: AppBar(
-        title: const Text('Transaction List'),
-        backgroundColor: theme.primaryColor,
+        title: const Text('Home'),
+        backgroundColor: theme.getPrimaryColor(),
         actions: [
           if (isIOS())
             TextButton(
-              style: theme.textButtonTheme.style,
               onPressed: () => _openAddTransaction(),
               child: const Text('ADD'),
             ),
@@ -163,15 +157,13 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
             return TransactionItem(
               key: UniqueKey(),
               index: index,
-              product: item,
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  Routes.DETAIL_SCREEN,
-                  arguments: DetailScreenArguments(item),
-                );
-              },
+              transaction: item,
               onDelete: (index) => _removeItem(index),
+              onEdit: (index) => _openAddTransaction(
+                mode: Mode.edit,
+                index: index,
+                transaction: item,
+              ),
             );
           },
           separatorBuilder: (context, index) {
@@ -212,6 +204,14 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
     _updateChartUI();
   }
 
+  void _editItem(int index, Transaction transaction) {
+    TransactionModel model =
+        Provider.of<TransactionModel>(context, listen: false);
+    model.update(index, transaction);
+    _updateChartData(transaction);
+    _updateChartUI();
+  }
+
   void _removeItem(int index) {
     TransactionModel model =
         Provider.of<TransactionModel>(context, listen: false);
@@ -235,6 +235,16 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
 
       _weekDayDatas[weekDayIndex].transactions.add(transaction);
     }
+  }
+
+  void _updateChartData(Transaction transaction) {
+    int weekDay = transaction.addTime.weekday;
+    int weekDayIndex =
+        _weekDayDatas.indexWhere((element) => element.weekDay.value == weekDay);
+    int itemIndex = _weekDayDatas[weekDayIndex]
+        .transactions
+        .indexWhere((element) => element.id == transaction.id);
+    _weekDayDatas[weekDayIndex].transactions[itemIndex] = transaction;
   }
 
   void _removeChartData(Transaction transaction) {
@@ -261,7 +271,11 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
     }).toList();
   }
 
-  void _openAddTransaction() {
+  void _openAddTransaction({
+    Mode mode = Mode.add,
+    int? index,
+    Transaction? transaction,
+  }) {
     final screenHeight = MediaQuery.of(context).size.height;
     showModalBottomSheet<Transaction>(
       context: context,
@@ -271,13 +285,20 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
           padding: MediaQuery.of(context).viewInsets,
           child: SizedBox(
             height: screenHeight / 2,
-            child: const AddTransaction(),
+            child: AddTransaction(
+              mode: mode,
+              transaction: transaction,
+            ),
           ),
         );
       },
     ).then((value) {
       if (value != null) {
-        _addItem(value);
+        if (mode == Mode.edit && index != null) {
+          _editItem(index, value);
+        } else {
+          _addItem(value);
+        }
       }
     });
   }

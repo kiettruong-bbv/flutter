@@ -1,5 +1,5 @@
 import 'package:expense_notes/routes.dart';
-import 'package:expense_notes/view/home_screen.dart';
+import 'package:expense_notes/view/transaction_list_screen.dart';
 import 'package:expense_notes/widget/platform_widget/platform_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +25,7 @@ class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
       themeMode: ThemeMode.system,
       initialRoute: Routes.ROOT,
       onGenerateRoute: (settings) => routes.routePage(settings),
-      home: const HomeScreen(),
+      home: const TransactionListScreen(),
     );
   }
 
@@ -40,7 +40,7 @@ class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
       ],
       initialRoute: Routes.ROOT,
       onGenerateRoute: (settings) => routes.routePage(settings),
-      home: const HomeScreen(),
+      home: const TransactionListScreen(),
     );
   }
 }

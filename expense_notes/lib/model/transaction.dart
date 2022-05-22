@@ -42,6 +42,14 @@ class Transaction {
     color = _generateRandomColor();
   }
 
+  Transaction.full({
+    required this.id,
+    required this.color,
+    required this.name,
+    required this.price,
+    required this.addTime,
+  });
+
   Color _generateRandomColor() {
     final Random random = Random();
     return Color.fromRGBO(

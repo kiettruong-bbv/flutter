@@ -1,34 +1,43 @@
 import 'dart:math';
 import 'package:expense_notes/extension/date_extension.dart';
 import 'package:expense_notes/model/transaction.dart';
+import 'package:expense_notes/routes.dart';
+import 'package:expense_notes/view/detail_screen.dart';
+import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
 
-typedef OnDeleteItemCallBack = Function(int index);
+typedef OnItemCallBack = Function(int index);
 
 class TransactionItem extends StatelessWidget {
   const TransactionItem({
     Key? key,
     required this.index,
-    required this.product,
-    required this.onTap,
+    required this.transaction,
     required this.onDelete,
+    required this.onEdit,
   }) : super(key: key);
 
   final int index;
-  final Transaction product;
-  final VoidCallback onTap;
-  final OnDeleteItemCallBack onDelete;
+  final Transaction transaction;
+  final OnItemCallBack onDelete;
+  final OnItemCallBack onEdit;
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    PlatformTheme theme = PlatformTheme(context);
 
     return GestureDetector(
-      onTap: () => onTap,
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          Routes.DETAIL_SCREEN,
+          arguments: DetailScreenArguments(transaction),
+        );
+      },
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: theme.backgroundColor,
+          color: theme.getBackgroundColor(),
           borderRadius: BorderRadius.circular(6),
           boxShadow: [
             BoxShadow(
@@ -45,15 +54,15 @@ class TransactionItem extends StatelessWidget {
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: product.color,
+                  color: transaction.color,
                   width: 3,
                 ),
               ),
               child: Center(
                 child: Text(
-                  '\$${product.price}',
+                  '\$${transaction.price}',
                   style: TextStyle(
-                    color: product.color,
+                    color: transaction.color,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
@@ -68,11 +77,14 @@ class TransactionItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.name,
-                    style: theme.textTheme.headline6,
+                    transaction.name,
+                    style: theme.getDefaultTextStyle()?.copyWith(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   Text(
-                    product.addTime.format(),
+                    transaction.addTime.format(),
                     style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 16,
@@ -81,18 +93,35 @@ class TransactionItem extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(
-              width: 40,
-              child: IconButton(
-                onPressed: () => onDelete(index),
-                icon: const Icon(
-                  Icons.delete,
-                  color: Colors.red,
-                ),
+            _buildIconButton(
+              onPressed: () => onEdit(index),
+              icon: const Icon(
+                Icons.edit,
+                color: Colors.blue,
+              ),
+            ),
+            _buildIconButton(
+              onPressed: () => onDelete(index),
+              icon: const Icon(
+                Icons.delete,
+                color: Colors.red,
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildIconButton({
+    required VoidCallback onPressed,
+    required Icon icon,
+  }) {
+    return SizedBox(
+      width: 40,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: icon,
       ),
     );
   }

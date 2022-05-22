@@ -14,6 +14,19 @@ class TransactionModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void update(int index, Transaction transaction) {
+    if (_transactions.isNotEmpty) {
+      final String id = _transactions[index].id;
+      final Color color = _transactions[index].color;
+      _transactions[index] = Transaction.full(
+          id: id,
+          color: color,
+          name: transaction.name,
+          price: transaction.price,
+          addTime: transaction.addTime);
+    }
+  }
+
   Transaction remove(int index) {
     Transaction transaction = _transactions.removeAt(index);
     notifyListeners();
