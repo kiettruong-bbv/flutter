@@ -13,6 +13,8 @@ class Routes {
   static const String SETTING_SCREEN = '/setting_screen';
 
   CupertinoPageRoute routePage(RouteSettings settings) {
+    final arguments = settings.arguments;
+
     return CupertinoPageRoute(
       settings: settings,
       builder: (BuildContext context) {
@@ -23,10 +25,10 @@ class Routes {
             return const TransactionListScreen();
           case DETAIL_SCREEN:
             return DetailScreen(
-              args: settings.arguments as DetailScreenArguments,
+              args: arguments as DetailScreenArguments,
             );
           case SETTING_SCREEN:
-            return SettingScreen();
+            return const SettingScreen();
         }
 
         return const Scaffold();
