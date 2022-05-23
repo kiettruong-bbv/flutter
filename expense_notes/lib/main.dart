@@ -11,6 +11,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => TransactionModel()),
+        ChangeNotifierProvider(create: (context) => ThemeManager()),
       ],
       child: const MyApp(),
     ),
@@ -25,17 +26,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final Future _initFuture = AppInit.initialize();
-
   Routes routes = Routes();
+  late Future _initFuture;
 
   @override
   void initState() {
     super.initState();
+    _initFuture = _initializeApp();
+  }
 
-    ThemeManager.instance.addListener(() {
-      setState(() {});
-    });
+  Future _initializeApp() async {
+    await context.read<ThemeManager>().setupTheme();
   }
 
   @override
@@ -44,20 +45,18 @@ class _MyAppState extends State<MyApp> {
       future: _initFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return PlatformApp(
-            routes: routes,
-            themeMode: ThemeManager.instance.getThemeMode(),
+          return Consumer<ThemeManager>(
+            builder: (context, themeManager, widget) {
+              return PlatformApp(
+                routes: routes,
+                themeMode: context.read<ThemeManager>().themeMode,
+              );
+            },
           );
         } else {
           return const SplashScreen();
         }
       },
     );
-  }
-}
-
-class AppInit {
-  static Future initialize() async {
-    await ThemeManager.instance.setupTheme();
   }
 }

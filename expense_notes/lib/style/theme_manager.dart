@@ -2,17 +2,12 @@ import 'package:expense_notes/constants/storage_key.dart';
 import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
 
-class ThemeManager extends ChangeNotifier {
-  ThemeManager._internal();
-  static final ThemeManager instance = ThemeManager._internal();
-
+class ThemeManager with ChangeNotifier {
   final LocalStorage _storage = LocalStorage(StorageKey.app);
 
   ThemeMode _currentTheme = ThemeMode.system;
 
-  ThemeMode getThemeMode() {
-    return _currentTheme;
-  }
+  ThemeMode get themeMode => _currentTheme;
 
   Future setupTheme() async {
     await _storage.ready;
@@ -30,6 +25,7 @@ class ThemeManager extends ChangeNotifier {
           _currentTheme = ThemeMode.system;
       }
     }
+    notifyListeners();
   }
 
   void toggleTheme(ThemeMode themeMode) {

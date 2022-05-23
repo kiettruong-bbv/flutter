@@ -2,6 +2,7 @@ import 'package:expense_notes/style/theme_manager.dart';
 import 'package:expense_notes/widget/app_drawer.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({Key? key}) : super(key: key);
@@ -11,19 +12,10 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  void _updateTheme({
-    required PlatformTheme theme,
-    required ThemeMode themeMode,
-  }) {
-    setState(() {
-      ThemeManager.instance.toggleTheme(themeMode);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     PlatformTheme theme = PlatformTheme(context);
-    ThemeMode themeMode = ThemeManager.instance.getThemeMode();
+    ThemeManager themeManager = context.watch<ThemeManager>();
 
     return Scaffold(
       drawer: const AppDrawer(current: Section.settings),
@@ -33,7 +25,7 @@ class _SettingScreenState extends State<SettingScreen> {
       ),
       body: Center(
         child: DropdownButton<ThemeMode>(
-          value: themeMode,
+          value: themeManager.themeMode,
           icon: const Icon(Icons.arrow_downward),
           elevation: 16,
           style: TextStyle(
@@ -54,10 +46,7 @@ class _SettingScreenState extends State<SettingScreen> {
           }).toList(),
           onChanged: (ThemeMode? newValue) {
             if (newValue != null) {
-              _updateTheme(
-                theme: theme,
-                themeMode: newValue,
-              );
+              themeManager.toggleTheme(newValue);
             }
           },
         ),
