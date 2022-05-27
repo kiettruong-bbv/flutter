@@ -1,4 +1,4 @@
-import 'package:expense_notes/style/custom_colors.dart';
+import 'package:expense_notes/style/my_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/extension/platform_extension.dart';
@@ -49,7 +49,7 @@ class PlatformThemeAndroid implements PlatformThemeInterface {
   @override
   TextStyle? getDrawerTitle() {
     return Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: CustomColors.white,
+          color: Colors.white,
           fontSize: 25,
         );
   }

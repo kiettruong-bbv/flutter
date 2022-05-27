@@ -1,4 +1,4 @@
-import 'package:expense_notes/style/custom_colors.dart';
+import 'package:expense_notes/style/my_colors.dart';
 import 'package:expense_notes/widget/platform_widget/platform_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +25,8 @@ class PlatformButton extends PlatformWidget<CupertinoButton, ElevatedButton> {
   @override
   CupertinoButton createIosWidget(BuildContext context) {
     return CupertinoButton(
-      color: Theme.of(context).primaryColor,
-      disabledColor: CustomColors.grey,
+      color: CupertinoTheme.of(context).primaryColor,
+      disabledColor: MyColors.grey,
       onPressed: onPressed,
       child: child,
     );

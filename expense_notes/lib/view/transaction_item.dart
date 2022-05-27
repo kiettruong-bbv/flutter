@@ -30,7 +30,7 @@ class TransactionItem extends StatelessWidget {
       onTap: () {
         Navigator.pushNamed(
           context,
-          Routes.DETAIL_SCREEN,
+          Routes.detail,
           arguments: DetailScreenArguments(transaction),
         );
       },

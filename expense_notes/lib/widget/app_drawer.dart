@@ -74,10 +74,10 @@ class AppDrawer extends StatelessWidget {
     }
     switch (section) {
       case Section.home:
-        Navigator.pushReplacementNamed(context, Routes.TRANSACTION_LIST_SCREEN);
+        Navigator.pushReplacementNamed(context, Routes.home);
         break;
       case Section.settings:
-        Navigator.pushReplacementNamed(context, Routes.SETTING_SCREEN);
+        Navigator.pushReplacementNamed(context, Routes.setting);
         break;
     }
   }

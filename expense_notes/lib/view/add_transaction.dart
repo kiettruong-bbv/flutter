@@ -1,5 +1,7 @@
+import 'package:expense_notes/extension/platform_extension.dart';
 import 'package:expense_notes/widget/platform_widget/platform_button.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/transaction.dart';
 import 'package:expense_notes/widget/date_time_input.dart';
@@ -53,14 +55,32 @@ class _AddTransactionState extends State<AddTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    PlatformTheme theme = PlatformTheme(context);
-    Color secondaryColor = theme.getSecondaryColor();
-
+    ThemeData theme = Theme.of(context);
     const space15 = SizedBox(height: 15);
+
+    Color backgroundColor = isAndroid()
+        ? Theme.of(context).scaffoldBackgroundColor
+        : CupertinoTheme.of(context).scaffoldBackgroundColor;
+
+    TextStyle? titleStyle = isAndroid()
+        ? Theme.of(context).textTheme.titleLarge
+        : CupertinoTheme.of(context).textTheme.navTitleTextStyle;
+
+    TextStyle? textFieldStyle = isAndroid()
+        ? Theme.of(context).textTheme.subtitle1
+        : CupertinoTheme.of(context).textTheme.textStyle;
+
+    TextStyle? hintStyle = isAndroid()
+        ? Theme.of(context).textTheme.caption
+        : CupertinoTheme.of(context).textTheme.tabLabelTextStyle;
+
+    TextStyle? buttonTextStyle = isAndroid()
+        ? Theme.of(context).textTheme.button
+        : CupertinoTheme.of(context).textTheme.textStyle;
 
     return Container(
       padding: const EdgeInsets.all(20),
-      color: theme.getBackgroundColor(),
+      color: backgroundColor,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -68,7 +88,7 @@ class _AddTransactionState extends State<AddTransaction> {
             children: [
               Text(
                 _isEditing ? 'Edit Transaction' : 'Add Transaction',
-                style: const TextStyle(
+                style: titleStyle?.copyWith(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
@@ -76,10 +96,7 @@ class _AddTransactionState extends State<AddTransaction> {
               const Spacer(),
               IconButton(
                 onPressed: () => Navigator.pop(context),
-                icon: Icon(
-                  Icons.close,
-                  color: secondaryColor,
-                ),
+                icon: const Icon(Icons.close),
               ),
             ],
           ),
@@ -89,22 +106,27 @@ class _AddTransactionState extends State<AddTransaction> {
           // NAME
           TextField(
             controller: _nameController,
+            style: textFieldStyle?.copyWith(
+              fontSize: 16,
+              textBaseline: TextBaseline.alphabetic,
+            ),
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.all(10),
               border: const OutlineInputBorder(),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: secondaryColor,
+                  color: theme.colorScheme.onSecondary,
                   width: 1,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: secondaryColor,
+                  color: theme.colorScheme.primary,
                   width: 1,
                 ),
               ),
-              labelText: 'Name',
+              hintText: 'Name',
+              hintStyle: hintStyle,
             ),
             onChanged: (_) => _validateButton(),
           ),
@@ -114,23 +136,28 @@ class _AddTransactionState extends State<AddTransaction> {
           // PRICE
           TextField(
             controller: _priceController,
+            style: textFieldStyle?.copyWith(
+              fontSize: 16,
+              textBaseline: TextBaseline.alphabetic,
+            ),
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.all(10),
               border: const OutlineInputBorder(),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: secondaryColor,
+                  color: theme.colorScheme.onSecondary,
                   width: 1,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: secondaryColor,
+                  color: theme.colorScheme.primary,
                   width: 1,
                 ),
               ),
-              labelText: 'Amount',
+              hintText: 'Amount',
+              hintStyle: hintStyle,
             ),
             onChanged: (_) => _validateButton(),
           ),
@@ -155,7 +182,7 @@ class _AddTransactionState extends State<AddTransaction> {
               onPressed: _isSubmitEnable ? _submitTransaction : null,
               child: Text(
                 _isEditing ? 'EDIT' : 'ADD',
-                style: theme.getButtonTextStyle(),
+                style: buttonTextStyle,
               ),
             ),
           ),

@@ -1,6 +1,8 @@
+import 'package:expense_notes/extension/platform_extension.dart';
 import 'package:expense_notes/style/theme_manager.dart';
 import 'package:expense_notes/widget/app_drawer.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,41 +17,80 @@ class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
     PlatformTheme theme = PlatformTheme(context);
-    ThemeManager themeManager = context.watch<ThemeManager>();
 
     return Scaffold(
       drawer: const AppDrawer(current: Section.settings),
       backgroundColor: theme.getBackgroundColor(),
       appBar: AppBar(
         title: const Text('Settings'),
+        backgroundColor: theme.getPrimaryColor(),
       ),
-      body: Center(
-        child: DropdownButton<ThemeMode>(
-          value: themeManager.themeMode,
-          icon: const Icon(Icons.arrow_downward),
-          elevation: 16,
-          style: TextStyle(
-            color: theme.getPrimaryColor(),
+      body: _buildThemeSection(),
+    );
+  }
+
+  Widget _buildThemeSection() {
+    return SizedBox(
+      height: 200,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _buildThemeItem(
+            context: context,
+            mode: ThemeMode.light,
           ),
-          items: <ThemeMode>[
-            ThemeMode.light,
-            ThemeMode.dark,
-            ThemeMode.system,
-          ].map<DropdownMenuItem<ThemeMode>>((value) {
-            return DropdownMenuItem<ThemeMode>(
-              value: value,
-              child: Text(
-                value.name,
-                style: theme.getDefaultTextStyle(),
-              ),
-            );
-          }).toList(),
-          onChanged: (ThemeMode? newValue) {
-            if (newValue != null) {
-              themeManager.toggleTheme(newValue);
-            }
-          },
-        ),
+          _buildThemeItem(
+            context: context,
+            mode: ThemeMode.dark,
+          ),
+          _buildThemeItem(
+            context: context,
+            mode: ThemeMode.system,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildThemeItem({
+    required BuildContext context,
+    required ThemeMode mode,
+  }) {
+    ThemeManager themeManager = context.watch<ThemeManager>();
+    ThemeData theme = Theme.of(context);
+
+    Color primaryColor = isAndroid()
+        ? Theme.of(context).primaryColor
+        : CupertinoTheme.of(context).primaryColor;
+
+    TextStyle? textStyle = isAndroid()
+        ? Theme.of(context).textTheme.titleLarge
+        : CupertinoTheme.of(context).textTheme.textStyle;
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        unselectedWidgetColor: theme.colorScheme.onPrimary,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Radio<ThemeMode>(
+            activeColor: primaryColor,
+            value: mode,
+            groupValue: themeManager.currentTheme,
+            onChanged: (ThemeMode? newTheme) {
+              if (newTheme != null) {
+                themeManager.toggleTheme(newTheme);
+              }
+            },
+          ),
+          Text(
+            mode.name,
+            style: textStyle,
+          ),
+        ],
       ),
     );
   }

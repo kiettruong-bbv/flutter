@@ -8,16 +8,16 @@ class DetailScreenArguments {
 }
 
 class DetailScreen extends StatelessWidget {
-  final DetailScreenArguments args;
-
   const DetailScreen({
     Key? key,
-    required this.args,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+
+    final args =
+        ModalRoute.of(context)!.settings.arguments as DetailScreenArguments;
 
     return Scaffold(
       appBar: AppBar(

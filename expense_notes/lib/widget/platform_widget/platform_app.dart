@@ -1,38 +1,41 @@
-import 'package:expense_notes/routes.dart';
+import 'package:expense_notes/style/my_theme.dart';
 import 'package:expense_notes/view/transaction_list_screen.dart';
 import 'package:expense_notes/widget/platform_widget/platform_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
-  final Routes routes;
+  final Map<String, WidgetBuilder> routes;
   final ThemeMode themeMode;
 
   const PlatformApp({
     Key? key,
-    required this.routes,
     required this.themeMode,
+    required this.routes,
   }) : super(key: key);
 
   @override
   MaterialApp createAndroidWidget(BuildContext context) {
     return MaterialApp(
       title: 'Expense Note',
-      theme: ThemeData(
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-      ),
+      theme: MyTheme.lightTheme,
+      darkTheme: MyTheme.darkTheme,
       themeMode: themeMode,
-      initialRoute: Routes.ROOT,
-      onGenerateRoute: (settings) => routes.routePage(settings),
+      routes: routes,
       home: const TransactionListScreen(),
     );
   }
 
   @override
   CupertinoApp createIosWidget(BuildContext context) {
+    CupertinoThemeData? theme;
+
+    if (themeMode == ThemeMode.light) {
+      theme = MyTheme.cupertinoLightTheme;
+    } else if (themeMode == ThemeMode.dark) {
+      theme = MyTheme.cupertinoDarkTheme;
+    }
+
     return CupertinoApp(
       title: 'Expense Note',
       localizationsDelegates: const [
@@ -40,8 +43,8 @@ class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
         DefaultCupertinoLocalizations.delegate,
         DefaultWidgetsLocalizations.delegate,
       ],
-      initialRoute: Routes.ROOT,
-      onGenerateRoute: (settings) => routes.routePage(settings),
+      theme: theme,
+      routes: routes,
       home: const TransactionListScreen(),
     );
   }

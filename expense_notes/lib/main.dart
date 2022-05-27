@@ -1,7 +1,10 @@
 import 'package:expense_notes/model/transaction_model.dart';
 import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/style/theme_manager.dart';
+import 'package:expense_notes/view/detail_screen.dart';
+import 'package:expense_notes/view/setting_screen.dart';
 import 'package:expense_notes/view/splash_screen.dart';
+import 'package:expense_notes/view/transaction_list_screen.dart';
 import 'package:expense_notes/widget/platform_widget/platform_app.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -48,8 +51,12 @@ class _MyAppState extends State<MyApp> {
           return Consumer<ThemeManager>(
             builder: (context, themeManager, widget) {
               return PlatformApp(
-                routes: routes,
-                themeMode: context.read<ThemeManager>().themeMode,
+                themeMode: context.read<ThemeManager>().currentTheme,
+                routes: {
+                  Routes.home: (context) => const TransactionListScreen(),
+                  Routes.setting: (context) => const SettingScreen(),
+                  Routes.detail: (context) => const DetailScreen(),
+                },
               );
             },
           );

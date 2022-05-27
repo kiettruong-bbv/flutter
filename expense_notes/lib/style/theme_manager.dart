@@ -7,7 +7,7 @@ class ThemeManager with ChangeNotifier {
 
   ThemeMode _currentTheme = ThemeMode.system;
 
-  ThemeMode get themeMode => _currentTheme;
+  ThemeMode get currentTheme => _currentTheme;
 
   Future setupTheme() async {
     await _storage.ready;

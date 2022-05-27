@@ -1,6 +1,5 @@
 import 'package:expense_notes/extension/date_extension.dart';
 import 'package:expense_notes/extension/platform_extension.dart';
-import 'package:expense_notes/style/custom_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -24,33 +23,36 @@ class _DateTimeInputState extends State<DateTimeInput> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    TextStyle? hintStyle = isAndroid()
+        ? Theme.of(context).textTheme.caption
+        : CupertinoTheme.of(context).textTheme.tabLabelTextStyle;
 
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: theme.colorScheme.secondary,
+          color: theme.colorScheme.onSecondary,
           width: 1,
         ),
-        borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+        borderRadius: const BorderRadius.all(
+          Radius.circular(4.0),
+        ),
       ),
       child: Row(
         children: [
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(selectedDate.format()),
+              child: Text(
+                selectedDate.format(),
+                style: hintStyle?.copyWith(
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
           IconButton(
-            onPressed: () {
-              isAndroid()
-                  ? _showDatePickerAndroid(context)
-                  : _showDatePickerIOS(context);
-            },
-            icon: Icon(
-              Icons.calendar_month,
-              color: theme.colorScheme.secondary,
-            ),
+            onPressed: () => _showDatePickerAndroid(context),
+            icon: const Icon(Icons.calendar_month),
           )
         ],
       ),
@@ -70,37 +72,5 @@ class _DateTimeInputState extends State<DateTimeInput> {
         widget.onDateTimeSelected?.call(picked);
       });
     }
-  }
-
-  Future<void> _showDatePickerIOS(BuildContext context) async {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (_) => Container(
-        height: 500,
-        color: CustomColors.white,
-        child: Column(
-          children: [
-            SizedBox(
-              height: 400,
-              child: CupertinoDatePicker(
-                mode: CupertinoDatePickerMode.date,
-                initialDateTime: DateTime.now(),
-                maximumDate: DateTime.now(),
-                onDateTimeChanged: (picked) {
-                  setState(() {
-                    selectedDate = picked;
-                    widget.onDateTimeSelected?.call(picked);
-                  });
-                },
-              ),
-            ),
-            CupertinoButton(
-              child: const Text('OK'),
-              onPressed: () => Navigator.of(context).pop(),
-            )
-          ],
-        ),
-      ),
-    );
   }
 }

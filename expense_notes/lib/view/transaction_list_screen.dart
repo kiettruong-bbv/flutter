@@ -1,10 +1,12 @@
 import 'package:expense_notes/extension/platform_extension.dart';
 import 'package:expense_notes/model/transaction_model.dart';
+import 'package:expense_notes/style/my_colors.dart';
 import 'package:expense_notes/view/transaction_item.dart';
 import 'package:expense_notes/widget/app_drawer.dart';
 import 'package:expense_notes/widget/chart.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/transaction.dart';
 import 'package:expense_notes/view/add_transaction.dart';
@@ -38,26 +40,42 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    PlatformTheme theme = PlatformTheme(context);
+    ThemeData theme = Theme.of(context);
+    CupertinoThemeData iosTheme = CupertinoTheme.of(context);
+
+    Color scaffoldBackgroundColor = isAndroid()
+        ? theme.scaffoldBackgroundColor
+        : iosTheme.scaffoldBackgroundColor;
+
+    Color primaryColor =
+        isAndroid() ? theme.primaryColor : iosTheme.primaryColor;
 
     return Scaffold(
-      backgroundColor: theme.getBackgroundColor(),
+      backgroundColor: scaffoldBackgroundColor,
       drawer: const AppDrawer(current: Section.home),
       appBar: AppBar(
         title: const Text('Home'),
-        backgroundColor: theme.getPrimaryColor(),
+        backgroundColor: primaryColor,
         actions: [
           if (isIOS())
             TextButton(
               onPressed: () => _openAddTransaction(),
-              child: const Text('ADD'),
+              child: Text(
+                'ADD',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                ),
+              ),
             ),
         ],
       ),
       floatingActionButton: isAndroid()
           ? FloatingActionButton(
               onPressed: () => _openAddTransaction(),
-              child: const Icon(Icons.add),
+              child: Icon(
+                Icons.add,
+                color: theme.colorScheme.onPrimary,
+              ),
             )
           : null,
       body: Column(
@@ -69,7 +87,7 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
           ),
           Expanded(
             flex: 5,
-            child: _buildListContainer(context),
+            child: _buildListContainer(),
           )
         ],
       ),
@@ -90,7 +108,6 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.3),
@@ -113,9 +130,17 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
     );
   }
 
-  Widget _buildListContainer(BuildContext context) {
+  Widget _buildListContainer() {
+    Color scaffoldBackgroundColor = isAndroid()
+        ? Theme.of(context).scaffoldBackgroundColor
+        : CupertinoTheme.of(context).scaffoldBackgroundColor;
+
+    TextStyle? textStyle = isAndroid()
+        ? Theme.of(context).textTheme.titleLarge
+        : CupertinoTheme.of(context).textTheme.textStyle;
+
     return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: scaffoldBackgroundColor,
       padding: const EdgeInsets.symmetric(
         vertical: 10,
         horizontal: 20,
@@ -123,9 +148,9 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
+          Text(
             "Transaction List",
-            style: TextStyle(
+            style: textStyle?.copyWith(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -140,13 +165,20 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
   }
 
   Widget _buildList() {
+    TextStyle? textStyle = isAndroid()
+        ? Theme.of(context).textTheme.titleLarge
+        : CupertinoTheme.of(context).textTheme.textStyle;
+
     return Consumer<TransactionModel>(
       builder: (context, model, child) {
         List<Transaction> transactions = model.transactions;
 
         if (transactions.isEmpty) {
-          return const Center(
-            child: Text('No transactions added yet!'),
+          return Center(
+            child: Text(
+              'No transactions added yet!',
+              style: textStyle,
+            ),
           );
         }
 
