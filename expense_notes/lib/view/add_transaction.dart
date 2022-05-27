@@ -1,6 +1,6 @@
 import 'package:expense_notes/extension/platform_extension.dart';
+import 'package:expense_notes/style/my_colors.dart';
 import 'package:expense_notes/widget/platform_widget/platform_button.dart';
-import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/transaction.dart';
@@ -12,11 +12,11 @@ class AddTransaction extends StatefulWidget {
   const AddTransaction({
     Key? key,
     required this.mode,
-    this.transaction,
+    this.editedTransaction,
   }) : super(key: key);
 
   final Mode mode;
-  final Transaction? transaction;
+  final Transaction? editedTransaction;
 
   @override
   State<AddTransaction> createState() => _AddTransactionState();
@@ -28,6 +28,7 @@ class _AddTransactionState extends State<AddTransaction> {
   DateTime _selectedDate = DateTime.now();
   bool _isSubmitEnable = false;
   bool _isEditing = false;
+  Transaction? _editedTransaction;
 
   @override
   void initState() {
@@ -36,12 +37,13 @@ class _AddTransactionState extends State<AddTransaction> {
     _priceController = TextEditingController();
 
     _isEditing = widget.mode == Mode.edit;
-
     if (_isEditing) {
-      Transaction? transaction = widget.transaction;
-      _nameController.text = transaction?.name ?? '';
-      _priceController.text = '${transaction?.price ?? 0}';
-      _selectedDate = transaction?.addTime ?? DateTime.now();
+      Transaction? editedTransaction = widget.editedTransaction;
+      _editedTransaction = editedTransaction;
+      _nameController.text = editedTransaction?.name ?? '';
+      _priceController.text = '${editedTransaction?.price ?? 0}';
+      _selectedDate = editedTransaction?.addTime ?? DateTime.now();
+      _isSubmitEnable = true;
     }
   }
 
@@ -192,12 +194,23 @@ class _AddTransactionState extends State<AddTransaction> {
   }
 
   void _submitTransaction() {
-    final product = Transaction(
+    Transaction newTransaction = Transaction(
       name: _nameController.text,
-      price: double.parse(_priceController.text),
+      price: int.parse(_priceController.text),
       addTime: _selectedDate,
     );
-    Navigator.pop(context, product);
+    if (_isEditing) {
+      _editedTransaction = Transaction.full(
+        id: _editedTransaction?.id ?? '',
+        color: _editedTransaction?.color ?? MyColors.primary,
+        name: newTransaction.name,
+        price: newTransaction.price,
+        addTime: newTransaction.addTime,
+      );
+      Navigator.pop(context, _editedTransaction);
+    } else {
+      Navigator.pop(context, newTransaction);
+    }
   }
 
   void _validateButton() {

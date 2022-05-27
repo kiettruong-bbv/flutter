@@ -30,7 +30,7 @@ class Transaction {
   late final Color color;
 
   final String name;
-  final double price;
+  final int price;
   final DateTime addTime;
 
   Transaction({
@@ -49,6 +49,13 @@ class Transaction {
     required this.price,
     required this.addTime,
   });
+
+  Transaction.update(Transaction transaction)
+      : id = transaction.id,
+        color = transaction.color,
+        name = transaction.name,
+        price = transaction.price,
+        addTime = transaction.addTime;
 
   Color _generateRandomColor() {
     final Random random = Random();

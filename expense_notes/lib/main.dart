@@ -1,3 +1,4 @@
+import 'package:expense_notes/model/chart_model.dart';
 import 'package:expense_notes/model/transaction_model.dart';
 import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/style/theme_manager.dart';
@@ -14,6 +15,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => TransactionModel()),
+        ChangeNotifierProvider(create: (context) => ChartModel()),
         ChangeNotifierProvider(create: (context) => ThemeManager()),
       ],
       child: const MyApp(),
