@@ -37,6 +37,8 @@ dependencies:
   fl_chart: ^0.50.1
   provider: ^6.0.2
   localstorage: ^4.0.0+1
+  firebase_core: ^1.17.1
+  cloud_firestore: ^3.1.17
 
 dev_dependencies:
   flutter_test:

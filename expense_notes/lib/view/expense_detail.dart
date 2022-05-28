@@ -1,10 +1,10 @@
-import 'package:expense_notes/model/transaction.dart';
+import 'package:expense_notes/model/expense.dart';
 import 'package:flutter/material.dart';
 
 class DetailScreenArguments {
-  final Transaction transaction;
+  final Expense expense;
 
-  DetailScreenArguments(this.transaction);
+  DetailScreenArguments(this.expense);
 }
 
 class DetailScreen extends StatelessWidget {
@@ -25,7 +25,7 @@ class DetailScreen extends StatelessWidget {
         backgroundColor: theme.primaryColor,
       ),
       body: Center(
-        child: Text(args.transaction.name),
+        child: Text(args.expense.name),
       ),
     );
   }

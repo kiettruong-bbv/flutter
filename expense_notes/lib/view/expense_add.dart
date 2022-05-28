@@ -3,32 +3,32 @@ import 'package:expense_notes/style/my_colors.dart';
 import 'package:expense_notes/widget/platform_widget/platform_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:expense_notes/model/transaction.dart';
+import 'package:expense_notes/model/expense.dart';
 import 'package:expense_notes/widget/date_time_input.dart';
 
 enum Mode { add, edit }
 
-class AddTransaction extends StatefulWidget {
-  const AddTransaction({
+class AddExpense extends StatefulWidget {
+  const AddExpense({
     Key? key,
     required this.mode,
-    this.editedTransaction,
+    this.editedExpense,
   }) : super(key: key);
 
   final Mode mode;
-  final Transaction? editedTransaction;
+  final Expense? editedExpense;
 
   @override
-  State<AddTransaction> createState() => _AddTransactionState();
+  State<AddExpense> createState() => _AddExpenseState();
 }
 
-class _AddTransactionState extends State<AddTransaction> {
+class _AddExpenseState extends State<AddExpense> {
   late TextEditingController _nameController;
   late TextEditingController _priceController;
   DateTime _selectedDate = DateTime.now();
   bool _isSubmitEnable = false;
   bool _isEditing = false;
-  Transaction? _editedTransaction;
+  Expense? _editedExpense;
 
   @override
   void initState() {
@@ -38,11 +38,11 @@ class _AddTransactionState extends State<AddTransaction> {
 
     _isEditing = widget.mode == Mode.edit;
     if (_isEditing) {
-      Transaction? editedTransaction = widget.editedTransaction;
-      _editedTransaction = editedTransaction;
-      _nameController.text = editedTransaction?.name ?? '';
-      _priceController.text = '${editedTransaction?.price ?? 0}';
-      _selectedDate = editedTransaction?.addTime ?? DateTime.now();
+      Expense? editedExpense = widget.editedExpense;
+      _editedExpense = editedExpense;
+      _nameController.text = editedExpense?.name ?? '';
+      _priceController.text = '${editedExpense?.price ?? 0}';
+      _selectedDate = editedExpense?.addTime ?? DateTime.now();
       _isSubmitEnable = true;
     }
   }
@@ -89,7 +89,7 @@ class _AddTransactionState extends State<AddTransaction> {
           Row(
             children: [
               Text(
-                _isEditing ? 'Edit Transaction' : 'Add Transaction',
+                _isEditing ? 'Edit Expense' : 'Add Expense',
                 style: titleStyle?.copyWith(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
@@ -181,7 +181,7 @@ class _AddTransactionState extends State<AddTransaction> {
             width: double.infinity,
             height: 44,
             child: PlatformButton(
-              onPressed: _isSubmitEnable ? _submitTransaction : null,
+              onPressed: _isSubmitEnable ? _submitExpense : null,
               child: Text(
                 _isEditing ? 'EDIT' : 'ADD',
                 style: buttonTextStyle,
@@ -193,23 +193,23 @@ class _AddTransactionState extends State<AddTransaction> {
     );
   }
 
-  void _submitTransaction() {
-    Transaction newTransaction = Transaction(
+  void _submitExpense() {
+    Expense newExpense = Expense(
       name: _nameController.text,
       price: int.parse(_priceController.text),
       addTime: _selectedDate,
     );
     if (_isEditing) {
-      _editedTransaction = Transaction.full(
-        id: _editedTransaction?.id ?? '',
-        color: _editedTransaction?.color ?? MyColors.primary,
-        name: newTransaction.name,
-        price: newTransaction.price,
-        addTime: newTransaction.addTime,
+      _editedExpense = Expense.full(
+        id: _editedExpense?.id ?? '',
+        color: _editedExpense?.color ?? '',
+        name: newExpense.name,
+        price: newExpense.price,
+        addTime: newExpense.addTime,
       );
-      Navigator.pop(context, _editedTransaction);
+      Navigator.pop(context, _editedExpense);
     } else {
-      Navigator.pop(context, newTransaction);
+      Navigator.pop(context, newExpense);
     }
   }
 

@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expense_notes/extension/color_extension.dart';
 import 'package:flutter/material.dart';
 
 enum WeekDay { mon, tue, wed, thu, fri, sat, sun }
@@ -25,24 +27,24 @@ extension CatExtension on WeekDay {
   }
 }
 
-class Transaction {
+class Expense {
   late final String id;
-  late final Color color;
+  late final String color;
 
   final String name;
   final int price;
   final DateTime addTime;
 
-  Transaction({
+  Expense({
     required this.name,
     required this.price,
     required this.addTime,
   }) {
     id = DateTime.now().millisecondsSinceEpoch.toString();
-    color = _generateRandomColor();
+    color = _generateRandomColor().toHexTriplet();
   }
 
-  Transaction.full({
+  Expense.full({
     required this.id,
     required this.color,
     required this.name,
@@ -50,12 +52,29 @@ class Transaction {
     required this.addTime,
   });
 
-  Transaction.update(Transaction transaction)
-      : id = transaction.id,
-        color = transaction.color,
-        name = transaction.name,
-        price = transaction.price,
-        addTime = transaction.addTime;
+  Expense.update(Expense expense)
+      : id = expense.id,
+        color = expense.color,
+        name = expense.name,
+        price = expense.price,
+        addTime = expense.addTime;
+
+  Expense.fromMap(Map<String, dynamic> data)
+      : id = data['id'],
+        color = data['color'],
+        name = data['name'],
+        price = data['price'],
+        addTime = (data['addTime'] as Timestamp).toDate();
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'color': color,
+      'name': name,
+      'price': price,
+      'addTime': Timestamp.fromDate(addTime),
+    };
+  }
 
   Color _generateRandomColor() {
     final Random random = Random();
@@ -66,14 +85,4 @@ class Transaction {
       1,
     );
   }
-}
-
-class WeekDayTransaction {
-  final WeekDay weekDay;
-  final List<Transaction> transactions;
-
-  WeekDayTransaction({
-    required this.weekDay,
-    required this.transactions,
-  });
 }

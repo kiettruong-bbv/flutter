@@ -44,9 +44,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 selectedDate.format(),
-                style: hintStyle?.copyWith(
-                  color: Colors.white,
-                ),
+                style: hintStyle,
               ),
             ),
           ),

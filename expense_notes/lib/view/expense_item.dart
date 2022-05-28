@@ -1,24 +1,25 @@
 import 'dart:math';
 import 'package:expense_notes/extension/date_extension.dart';
-import 'package:expense_notes/model/transaction.dart';
+import 'package:expense_notes/model/expense.dart';
 import 'package:expense_notes/routes.dart';
-import 'package:expense_notes/view/detail_screen.dart';
+import 'package:expense_notes/style/my_colors.dart';
+import 'package:expense_notes/view/expense_detail.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
 
-typedef OnItemCallBack = Function(int index);
+typedef OnItemCallBack = Function(String documentId);
 
-class TransactionItem extends StatelessWidget {
-  const TransactionItem({
+class ExpenseItem extends StatelessWidget {
+  const ExpenseItem({
     Key? key,
-    required this.index,
-    required this.transaction,
+    required this.documentId,
+    required this.expense,
     required this.onDelete,
     required this.onEdit,
   }) : super(key: key);
 
-  final int index;
-  final Transaction transaction;
+  final String documentId;
+  final Expense expense;
   final OnItemCallBack onDelete;
   final OnItemCallBack onEdit;
 
@@ -26,12 +27,14 @@ class TransactionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     PlatformTheme theme = PlatformTheme(context);
 
+    Color expenseColor = getColorFromHex(expense.color) ?? MyColors.primary;
+
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(
           context,
           Routes.detail,
-          arguments: DetailScreenArguments(transaction),
+          arguments: DetailScreenArguments(expense),
         );
       },
       child: Container(
@@ -54,15 +57,15 @@ class TransactionItem extends StatelessWidget {
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: transaction.color,
+                  color: expenseColor,
                   width: 3,
                 ),
               ),
               child: Center(
                 child: Text(
-                  '\$${transaction.price}',
+                  '\$${expense.price}',
                   style: TextStyle(
-                    color: transaction.color,
+                    color: expenseColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
@@ -77,14 +80,14 @@ class TransactionItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    transaction.name,
+                    expense.name,
                     style: theme.getDefaultTextStyle()?.copyWith(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                   ),
                   Text(
-                    transaction.addTime.format(),
+                    expense.addTime.format(),
                     style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 16,
@@ -94,14 +97,14 @@ class TransactionItem extends StatelessWidget {
               ),
             ),
             _buildIconButton(
-              onPressed: () => onEdit(index),
+              onPressed: () => onEdit(documentId),
               icon: const Icon(
                 Icons.edit,
                 color: Colors.blue,
               ),
             ),
             _buildIconButton(
-              onPressed: () => onDelete(index),
+              onPressed: () => onDelete(documentId),
               icon: const Icon(
                 Icons.delete,
                 color: Colors.red,
@@ -126,13 +129,16 @@ class TransactionItem extends StatelessWidget {
     );
   }
 
-  Color generateRandomColor() {
-    final Random random = Random();
-    return Color.fromRGBO(
-      random.nextInt(255),
-      random.nextInt(255),
-      random.nextInt(255),
-      1,
-    );
+  Color? getColorFromHex(String hexColor) {
+    hexColor = hexColor.replaceAll("#", "");
+    if (hexColor.length == 6) {
+      hexColor = "FF" + hexColor;
+    }
+
+    if (hexColor.length == 8) {
+      return Color(int.parse("0x$hexColor"));
+    }
+
+    return null;
   }
 }

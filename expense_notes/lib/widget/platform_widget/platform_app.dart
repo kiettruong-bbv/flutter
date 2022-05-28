@@ -1,5 +1,6 @@
 import 'package:expense_notes/style/my_theme.dart';
-import 'package:expense_notes/view/transaction_list_screen.dart';
+import 'package:expense_notes/view/expense_list.dart';
+import 'package:expense_notes/view/home.dart';
 import 'package:expense_notes/widget/platform_widget/platform_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
       darkTheme: MyTheme.darkTheme,
       themeMode: themeMode,
       routes: routes,
-      home: const TransactionListScreen(),
+      home: const HomeScreen(),
     );
   }
 
@@ -45,7 +46,7 @@ class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
       ],
       theme: theme,
       routes: routes,
-      home: const TransactionListScreen(),
+      home: const HomeScreen(),
     );
   }
 }
