@@ -1,4 +1,5 @@
 import 'package:expense_notes/extension/platform_extension.dart';
+import 'package:expense_notes/style/my_colors.dart';
 import 'package:expense_notes/style/theme_manager.dart';
 import 'package:expense_notes/widget/app_drawer.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
@@ -25,7 +26,36 @@ class _SettingScreenState extends State<SettingScreen> {
         title: const Text('Settings'),
         backgroundColor: theme.getPrimaryColor(),
       ),
-      body: _buildThemeSection(),
+      body: _buildSection(
+        child: _buildThemeSection(),
+      ),
+    );
+  }
+
+  Widget _buildSection({required Widget child}) {
+    PlatformTheme theme = PlatformTheme(context);
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.getBackgroundColor(),
+          borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 3,
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: child,
+      ),
     );
   }
 
@@ -58,26 +88,18 @@ class _SettingScreenState extends State<SettingScreen> {
     required ThemeMode mode,
   }) {
     ThemeManager themeManager = context.watch<ThemeManager>();
-    ThemeData theme = Theme.of(context);
-
-    Color primaryColor = isAndroid()
-        ? Theme.of(context).primaryColor
-        : CupertinoTheme.of(context).primaryColor;
-
-    TextStyle? textStyle = isAndroid()
-        ? Theme.of(context).textTheme.titleLarge
-        : CupertinoTheme.of(context).textTheme.textStyle;
+    PlatformTheme theme = PlatformTheme(context);
 
     return Theme(
       data: Theme.of(context).copyWith(
-        unselectedWidgetColor: theme.colorScheme.onPrimary,
+        unselectedWidgetColor: MyColors.grey,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Radio<ThemeMode>(
-            activeColor: primaryColor,
+            activeColor: theme.getPrimaryColor(),
             value: mode,
             groupValue: themeManager.currentTheme,
             onChanged: (ThemeMode? newTheme) {
@@ -88,7 +110,7 @@ class _SettingScreenState extends State<SettingScreen> {
           ),
           Text(
             mode.name,
-            style: textStyle,
+            style: theme.getDefaultTextStyle(),
           ),
         ],
       ),

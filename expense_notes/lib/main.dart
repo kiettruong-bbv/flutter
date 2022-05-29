@@ -2,16 +2,14 @@ import 'package:expense_notes/model/chart_model.dart';
 import 'package:expense_notes/model/expense_model.dart';
 import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/style/theme_manager.dart';
-import 'package:expense_notes/view/expense_detail.dart';
-import 'package:expense_notes/view/home.dart';
-import 'package:expense_notes/view/setting.dart';
-import 'package:expense_notes/view/splash.dart';
-import 'package:expense_notes/view/expense_list.dart';
+import 'package:expense_notes/view/expense_detail_screen.dart';
+import 'package:expense_notes/view/home_screen.dart';
+import 'package:expense_notes/view/setting_screen.dart';
+import 'package:expense_notes/view/splash_screen.dart';
 import 'package:expense_notes/widget/platform_widget/platform_app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

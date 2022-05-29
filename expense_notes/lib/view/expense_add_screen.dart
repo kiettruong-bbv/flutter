@@ -1,5 +1,4 @@
 import 'package:expense_notes/extension/platform_extension.dart';
-import 'package:expense_notes/style/my_colors.dart';
 import 'package:expense_notes/widget/platform_widget/platform_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -184,7 +183,9 @@ class _AddExpenseState extends State<AddExpense> {
               onPressed: _isSubmitEnable ? _submitExpense : null,
               child: Text(
                 _isEditing ? 'EDIT' : 'ADD',
-                style: buttonTextStyle,
+                style: buttonTextStyle?.copyWith(
+                  color: Colors.white,
+                ),
               ),
             ),
           ),

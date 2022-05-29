@@ -93,10 +93,10 @@ class PlatformThemeIOS implements PlatformThemeInterface {
 
   @override
   TextStyle? getDrawerTitle() {
-    return CupertinoTheme.of(context)
-        .textTheme
-        .navTitleTextStyle
-        .copyWith(fontSize: 25);
+    return CupertinoTheme.of(context).textTheme.navTitleTextStyle.copyWith(
+          color: Colors.white,
+          fontSize: 25,
+        );
   }
 
   @override

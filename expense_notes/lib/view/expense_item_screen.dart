@@ -3,7 +3,7 @@ import 'package:expense_notes/extension/date_extension.dart';
 import 'package:expense_notes/model/expense.dart';
 import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/style/my_colors.dart';
-import 'package:expense_notes/view/expense_detail.dart';
+import 'package:expense_notes/view/expense_detail_screen.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +26,6 @@ class ExpenseItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     PlatformTheme theme = PlatformTheme(context);
-
     Color expenseColor = getColorFromHex(expense.color) ?? MyColors.primary;
 
     return GestureDetector(
@@ -54,6 +53,7 @@ class ExpenseItem extends StatelessWidget {
         child: Row(
           children: [
             Container(
+              width: 80,
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 border: Border.all(
@@ -64,6 +64,7 @@ class ExpenseItem extends StatelessWidget {
               child: Center(
                 child: Text(
                   '\$${expense.price}',
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: expenseColor,
                     fontWeight: FontWeight.bold,
@@ -81,6 +82,7 @@ class ExpenseItem extends StatelessWidget {
                 children: [
                   Text(
                     expense.name,
+                    overflow: TextOverflow.ellipsis,
                     style: theme.getDefaultTextStyle()?.copyWith(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

@@ -1,14 +1,14 @@
 import 'package:expense_notes/extension/platform_extension.dart';
 import 'package:expense_notes/model/chart_model.dart';
 import 'package:expense_notes/model/expense_model.dart';
-import 'package:expense_notes/view/expense_chart.dart';
-import 'package:expense_notes/view/expense_list.dart';
+import 'package:expense_notes/view/expense_chart_screen.dart';
+import 'package:expense_notes/view/expense_list_screen.dart';
 import 'package:expense_notes/widget/app_drawer.dart';
 import 'package:expense_notes/widget/chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/expense.dart';
-import 'package:expense_notes/view/expense_add.dart';
+import 'package:expense_notes/view/expense_add_screen.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
