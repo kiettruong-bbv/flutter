@@ -4,6 +4,7 @@ import 'package:expense_notes/view/home_screen.dart';
 import 'package:expense_notes/widget/platform_widget/platform_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
   final Map<String, WidgetBuilder> routes;
@@ -29,12 +30,17 @@ class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
 
   @override
   CupertinoApp createIosWidget(BuildContext context) {
+    final brightness = SchedulerBinding.instance!.window.platformBrightness;
     CupertinoThemeData? theme;
 
     if (themeMode == ThemeMode.light) {
       theme = MyTheme.cupertinoLightTheme;
     } else if (themeMode == ThemeMode.dark) {
       theme = MyTheme.cupertinoDarkTheme;
+    } else {
+      theme = brightness == Brightness.dark
+          ? MyTheme.cupertinoDarkTheme
+          : MyTheme.cupertinoLightTheme;
     }
 
     return CupertinoApp(

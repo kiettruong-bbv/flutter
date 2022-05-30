@@ -56,12 +56,17 @@ class _AddExpenseState extends State<AddExpense> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
     const space15 = SizedBox(height: 15);
 
     Color backgroundColor = isAndroid()
         ? Theme.of(context).scaffoldBackgroundColor
         : CupertinoTheme.of(context).scaffoldBackgroundColor;
+
+    Color backgroundAccentColor = Theme.of(context).colorScheme.onSecondary;
+
+    Color primaryColor = isAndroid()
+        ? Theme.of(context).primaryColor
+        : CupertinoTheme.of(context).primaryColor;
 
     TextStyle? titleStyle = isAndroid()
         ? Theme.of(context).textTheme.titleLarge
@@ -116,13 +121,13 @@ class _AddExpenseState extends State<AddExpense> {
               border: const OutlineInputBorder(),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: theme.colorScheme.onSecondary,
+                  color: backgroundAccentColor,
                   width: 1,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: theme.colorScheme.primary,
+                  color: primaryColor,
                   width: 1,
                 ),
               ),
@@ -147,13 +152,13 @@ class _AddExpenseState extends State<AddExpense> {
               border: const OutlineInputBorder(),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: theme.colorScheme.onSecondary,
+                  color: backgroundAccentColor,
                   width: 1,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: theme.colorScheme.primary,
+                  color: primaryColor,
                   width: 1,
                 ),
               ),

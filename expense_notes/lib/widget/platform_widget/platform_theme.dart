@@ -1,4 +1,3 @@
-import 'package:expense_notes/style/my_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/extension/platform_extension.dart';

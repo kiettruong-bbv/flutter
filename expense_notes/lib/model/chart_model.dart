@@ -2,9 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_notes/model/expense.dart';
 import 'package:expense_notes/model/week_day_expense.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
 
-class ChartModel extends ChangeNotifier {
+class ChartModel {
   CollectionReference chartRef = FirebaseFirestore.instance.collection('chart');
 
   Future addChartData(Expense expense) async {

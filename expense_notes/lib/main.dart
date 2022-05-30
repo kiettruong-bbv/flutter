@@ -17,8 +17,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => ExpenseModel()),
-        ChangeNotifierProvider(create: (context) => ChartModel()),
+        Provider(create: (context) => ExpenseModel()),
+        Provider(create: (context) => ChartModel()),
         ChangeNotifierProvider(create: (context) => ThemeManager()),
       ],
       child: const MyApp(),
