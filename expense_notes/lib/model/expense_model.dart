@@ -1,32 +1,48 @@
+import 'dart:collection';
 import 'package:expense_notes/model/expense.dart';
+import 'package:expense_notes/service/expense_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ExpenseModel {
-  CollectionReference expensesRef =
-      FirebaseFirestore.instance.collection('expenses');
+class ExpenseModel extends ChangeNotifier {
+  final List<Expense> _expenses = [];
+  final IExpenseRepository _expenseRepository;
+
+  ExpenseModel(this._expenseRepository);
+
+  UnmodifiableListView<Expense> get expenses => UnmodifiableListView(_expenses);
+
+  Future<List<Expense>> getAll() async {
+    final List<Expense> expenses = await _expenseRepository.getAll();
+    _expenses.addAll(expenses);
+    return expenses;
+  }
 
   Future addItem(Expense expense) async {
-    await expensesRef.add(expense.toMap());
+    await _expenseRepository.create(expense);
+
+    _expenses.add(expense);
+    notifyListeners();
   }
 
-  Future<Expense> deleteItem(String documentId) async {
-    final documentSnapshot = await expensesRef.doc(documentId).get();
-    final Map<String, dynamic> dataMap =
-        documentSnapshot.data()! as Map<String, dynamic>;
+  Future deleteItem(int index, Expense expense) async {
+    await _expenseRepository.delete(expense.id);
 
-    await expensesRef
-        .doc(documentId)
-        .delete()
-        .catchError((error) => print("Failed to delete expense: $error"));
-
-    return Expense.fromMap(dataMap);
+    final Expense deletedItem = _expenses.removeAt(index);
+    notifyListeners();
+    return deletedItem;
   }
 
-  Future updateItem(String documentId, Expense expense) async {
-    await expensesRef
-        .doc(documentId)
-        .update(expense.toMap())
-        .catchError((error) => print("Failed to update expense: $error"));
+  Future updateItem(int index, Expense expense) async {
+    await _expenseRepository.update(expense.id, expense);
+
+    final String color = _expenses[index].color;
+    _expenses[index] = Expense.full(
+        id: expense.id,
+        color: color,
+        name: expense.name,
+        price: expense.price,
+        addTime: expense.addTime);
+
+    notifyListeners();
   }
 }

@@ -1,82 +1,75 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:collection';
 import 'package:expense_notes/model/expense.dart';
 import 'package:expense_notes/model/week_day_expense.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 
-class ChartModel {
-  CollectionReference chartRef = FirebaseFirestore.instance.collection('chart');
+class ChartModel extends ChangeNotifier {
+  List<WeekDayExpense> _weekDayDatas = [
+    WeekDayExpense(weekDay: WeekDay.mon, expenses: []),
+    WeekDayExpense(weekDay: WeekDay.tue, expenses: []),
+    WeekDayExpense(weekDay: WeekDay.wed, expenses: []),
+    WeekDayExpense(weekDay: WeekDay.thu, expenses: []),
+    WeekDayExpense(weekDay: WeekDay.fri, expenses: []),
+    WeekDayExpense(weekDay: WeekDay.sat, expenses: []),
+    WeekDayExpense(weekDay: WeekDay.sun, expenses: []),
+  ];
 
-  Future addChartData(Expense expense) async {
-    checkAndAddCollectionIfNotExist();
+  List<BarChartGroupData> _chartData = [];
 
-    final DateTime today = DateTime.now();
-    final DateTime day6FromToday =
-        DateTime(today.year, today.month, today.day - 7);
+  UnmodifiableListView<BarChartGroupData> get chartData =>
+      UnmodifiableListView(_chartData);
 
-    if (expense.addTime.isAfter(day6FromToday) &&
-        expense.addTime.isBefore(today)) {
-      final int weekDay = expense.addTime.weekday;
+  void addChart(Expense expense) {
+    _addChart(expense);
+    populateChart();
+  }
 
-      final weekdayExpSnapshot =
-          await chartRef.where('weekDay', isEqualTo: weekDay).get();
-      final String docId = weekdayExpSnapshot.docs.first.reference.id;
+  void updateChart(Expense oldTrans, Expense newTrans) {
+    _updateChart(oldTrans, newTrans);
+    populateChart();
+  }
 
-      await chartRef.doc(docId).update({
-        'expenses': FieldValue.arrayUnion([expense.toMap()])
-      });
+  void deleteChart(Expense expense) {
+    _deleteChart(expense);
+    populateChart();
+  }
+
+  void initChart(List<Expense> expenses) {
+    for (Expense item in expenses) {
+      int weekDay = item.addTime.weekday;
+      int weekDayIndex = _weekDayDatas
+          .indexWhere((element) => element.weekDay.value == weekDay);
+      _weekDayDatas[weekDayIndex].expenses.add(item);
     }
   }
 
-  Future removeChartData(Expense expense) async {
-    final int weekDay = expense.addTime.weekday;
-
-    final weekdayExpSnapshot =
-        await chartRef.where('weekDay', isEqualTo: weekDay).get();
-    final String docId = weekdayExpSnapshot.docs.first.reference.id;
-
-    await chartRef.doc(docId).update({
-      'expenses': FieldValue.arrayRemove([expense.toMap()])
-    });
-  }
-
-  Future editChartData(Expense oldTrans, Expense newTrans) async {
-    await addChartData(newTrans);
-    await removeChartData(oldTrans);
-  }
-
-  List<WeekDayExpense> sortWeekDayDatas(
-    List<WeekDayExpense> weekDayDatas,
-  ) {
-    List<WeekDayExpense> sorted = weekDayDatas;
-
+  void sortWeekdayByToday() {
     int todayWeekDay = DateTime.now().weekday;
 
     if (todayWeekDay == WeekDay.sun.value) {
-      return sorted;
+      return;
     }
-    int todayData =
-        sorted.indexWhere((element) => element.weekDay.value == todayWeekDay);
+    int todayData = _weekDayDatas
+        .indexWhere((element) => element.weekDay.value == todayWeekDay);
 
     // Get all weekday data after today
-    List<WeekDayExpense> weekDayDataAfterToday = sorted.sublist(todayData + 1);
+    List<WeekDayExpense> weekDayDataAfterToday =
+        _weekDayDatas.sublist(todayData + 1);
 
     // Remove after-today data of current data list
-    sorted.length = sorted.length - weekDayDataAfterToday.length;
+    _weekDayDatas.length = _weekDayDatas.length - weekDayDataAfterToday.length;
 
     // Append to beginning of weekday data
-    sorted = weekDayDataAfterToday + sorted;
-
-    return sorted;
+    _weekDayDatas = weekDayDataAfterToday + _weekDayDatas;
   }
 
-  List<BarChartGroupData> getListBarChartGroupData(
-    List<WeekDayExpense> weekDayDatas,
-  ) {
-    return weekDayDatas.asMap().entries.map((entry) {
-      WeekDayExpense wdExpense = entry.value;
-      double toY = (wdExpense.expenses.length / weekDayDatas.length) * 10;
+  void populateChart() {
+    _chartData = _weekDayDatas.asMap().entries.map((entry) {
+      WeekDayExpense trans = entry.value;
+      double toY = (trans.expenses.length / _weekDayDatas.length) * 10;
       return BarChartGroupData(
-        x: wdExpense.weekDay.value - 1,
+        x: trans.weekDay.value - 1,
         barRods: [
           BarChartRodData(
             toY: toY,
@@ -84,32 +77,46 @@ class ChartModel {
         ],
       );
     }).toList();
+
+    notifyListeners();
   }
 
-  Future checkAndAddCollectionIfNotExist() async {
-    final snapshot = await chartRef.get();
-    if (snapshot.docs.isEmpty) {
-      await chartRef.doc(WeekDay.mon.value.toString()).set(
-            WeekDayExpense(weekDay: WeekDay.mon, expenses: []).toMap(),
-          );
-      await chartRef.doc(WeekDay.tue.value.toString()).set(
-            WeekDayExpense(weekDay: WeekDay.tue, expenses: []).toMap(),
-          );
-      await chartRef.doc(WeekDay.wed.value.toString()).set(
-            WeekDayExpense(weekDay: WeekDay.wed, expenses: []).toMap(),
-          );
-      await chartRef.doc(WeekDay.thu.value.toString()).set(
-            WeekDayExpense(weekDay: WeekDay.thu, expenses: []).toMap(),
-          );
-      await chartRef.doc(WeekDay.fri.value.toString()).set(
-            WeekDayExpense(weekDay: WeekDay.fri, expenses: []).toMap(),
-          );
-      await chartRef.doc(WeekDay.sat.value.toString()).set(
-            WeekDayExpense(weekDay: WeekDay.sat, expenses: []).toMap(),
-          );
-      await chartRef.doc(WeekDay.sun.value.toString()).set(
-            WeekDayExpense(weekDay: WeekDay.sun, expenses: []).toMap(),
-          );
+  void _addChart(Expense expense) {
+    DateTime today = DateTime.now();
+    DateTime day6FromToday = DateTime(today.year, today.month, today.day - 7);
+
+    if (expense.addTime.isAfter(day6FromToday) &&
+        expense.addTime.isBefore(today)) {
+      int weekDay = expense.addTime.weekday;
+      int weekDayIndex = _weekDayDatas
+          .indexWhere((element) => element.weekDay.value == weekDay);
+
+      _weekDayDatas[weekDayIndex].expenses.add(expense);
+    }
+  }
+
+  void _deleteChart(Expense expense) {
+    int weekDay = expense.addTime.weekday;
+    int weekDayIndex =
+        _weekDayDatas.indexWhere((element) => element.weekDay.value == weekDay);
+    _weekDayDatas[weekDayIndex]
+        .expenses
+        .removeWhere((element) => element.id == expense.id);
+  }
+
+  void _updateChart(Expense oldTrans, Expense newTrans) {
+    int oldWeekDay = oldTrans.addTime.weekday;
+    int oldWeekDayIndex = _weekDayDatas
+        .indexWhere((element) => element.weekDay.value == oldWeekDay);
+
+    if (oldWeekDay == newTrans.addTime.weekday) {
+      int itemIndex = _weekDayDatas[oldWeekDayIndex]
+          .expenses
+          .indexWhere((element) => element.id == oldTrans.id);
+      _weekDayDatas[oldWeekDayIndex].expenses[itemIndex] = newTrans;
+    } else {
+      _deleteChart(oldTrans);
+      _addChart(newTrans);
     }
   }
 }

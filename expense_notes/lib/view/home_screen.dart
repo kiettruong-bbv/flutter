@@ -4,7 +4,6 @@ import 'package:expense_notes/model/expense_model.dart';
 import 'package:expense_notes/view/expense_chart_screen.dart';
 import 'package:expense_notes/view/expense_list_screen.dart';
 import 'package:expense_notes/widget/app_drawer.dart';
-import 'package:expense_notes/widget/chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/expense.dart';
@@ -19,6 +18,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late Future _initFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _initFuture = _initData();
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
@@ -59,59 +66,30 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             )
           : null,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Expanded(
-            flex: 3,
-            child: ExpenseChart(),
-          ),
-          Expanded(
-            flex: 5,
-            child: _buildListContainer(),
-          )
-        ],
-      ),
+      body: FutureBuilder(
+          future: _initFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Expanded(
+                  flex: 3,
+                  child: ExpenseChartScreen(),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: _buildListContainer(),
+                )
+              ],
+            );
+          }),
     );
   }
-
-  // Widget _buildChart() {
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //       boxShadow: [
-  //         BoxShadow(
-  //           color: Colors.grey.withOpacity(0.3),
-  //           spreadRadius: 2,
-  //           blurRadius: 4,
-  //           offset: const Offset(0, 2),
-  //         ),
-  //       ],
-  //     ),
-  //     margin: const EdgeInsets.all(20),
-  //     child: AspectRatio(
-  //       aspectRatio: 1,
-  //       child: Card(
-  //         elevation: 0,
-  //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-  //         color: const Color(0xff2c4260),
-  //         child: Consumer<ChartModel>(
-  //           builder: ((context, value, child) {
-  //             return (value.chartData.isEmpty)
-  //                 ? const Center(
-  //                     child: Text(
-  //                       'Add expense to display chart.',
-  //                       style: TextStyle(color: Colors.white),
-  //                     ),
-  //                   )
-  //                 : MyBarChart(
-  //                     barGroups: value.chartData,
-  //                   );
-  //           }),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _buildListContainer() {
     Color scaffoldBackgroundColor = isAndroid()
@@ -141,15 +119,15 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 10),
           Expanded(
             child: ExpenseList(
-              onDelete: (documentId) => _deleteItem(documentId),
+              onDelete: (index, expense) => _deleteItem(index, expense),
               onEdit: (
                 mode,
-                documentId,
+                index,
                 expense,
               ) =>
                   _openAddExpense(
+                index: index,
                 mode: mode,
-                documentId: documentId,
                 expense: expense,
               ),
             ),
@@ -159,37 +137,47 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future _initData() async {
+    ExpenseModel expenseModel = context.read<ExpenseModel>();
+    List<Expense> expenses = await expenseModel.getAll();
+
+    ChartModel chartModel = context.read<ChartModel>();
+    chartModel.sortWeekdayByToday();
+    chartModel.initChart(expenses);
+    chartModel.populateChart();
+  }
+
   Future _addItem(Expense expense) async {
     ExpenseModel expenseModel = context.read<ExpenseModel>();
     await expenseModel.addItem(expense);
 
     ChartModel chartModel = context.read<ChartModel>();
-    await chartModel.addChartData(expense);
+    chartModel.addChart(expense);
+  }
+
+  Future _deleteItem(int index, Expense expense) async {
+    ExpenseModel expenseModel = context.read<ExpenseModel>();
+    final deletedItem = await expenseModel.deleteItem(index, expense);
+
+    ChartModel chartModel = context.read<ChartModel>();
+    chartModel.deleteChart(deletedItem);
   }
 
   Future _editItem(
-    String documentId,
+    int index,
     Expense oldTrans,
     Expense newTrans,
   ) async {
     ExpenseModel expenseModel = context.read<ExpenseModel>();
-    await expenseModel.updateItem(documentId, newTrans);
+    await expenseModel.updateItem(index, newTrans);
 
     ChartModel chartModel = context.read<ChartModel>();
-    await chartModel.editChartData(oldTrans, newTrans);
-  }
-
-  Future _deleteItem(String documentId) async {
-    ExpenseModel expenseModel = context.read<ExpenseModel>();
-    final deletedExpense = await expenseModel.deleteItem(documentId);
-
-    ChartModel chartModel = context.read<ChartModel>();
-    await chartModel.removeChartData(deletedExpense);
+    chartModel.updateChart(oldTrans, newTrans);
   }
 
   void _openAddExpense({
     Mode mode = Mode.add,
-    String? documentId,
+    int? index,
     Expense? expense,
   }) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -210,8 +198,8 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     ).then((newValue) {
       if (newValue != null) {
-        if (mode == Mode.edit && documentId != null && expense != null) {
-          _editItem(documentId, expense, newValue);
+        if (mode == Mode.edit && index != null && expense != null) {
+          _editItem(index, expense, newValue);
         } else {
           _addItem(newValue);
         }

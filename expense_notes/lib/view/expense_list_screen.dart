@@ -1,19 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_notes/extension/platform_extension.dart';
 import 'package:expense_notes/model/expense.dart';
 import 'package:expense_notes/model/expense_model.dart';
 import 'package:expense_notes/view/expense_add_screen.dart';
-import 'package:expense_notes/view/expense_item_screen.dart';
+import 'package:expense_notes/widget/expense_item_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 typedef EditCallBack = void Function(
   Mode mode,
-  String documentId,
+  int index,
   Expense expense,
 );
-typedef DeleteCallBack = void Function(String documentId);
+typedef DeleteCallBack = void Function(
+  int index,
+  Expense expense,
+);
 
 class ExpenseList extends StatelessWidget {
   final EditCallBack onEdit;
@@ -31,57 +33,36 @@ class ExpenseList extends StatelessWidget {
         ? Theme.of(context).textTheme.titleLarge
         : CupertinoTheme.of(context).textTheme.textStyle;
 
-    ExpenseModel expenseModel = context.read<ExpenseModel>();
+    return Consumer<ExpenseModel>(builder: (context, model, child) {
+      List<Expense> expenses = model.expenses;
 
-    return StreamBuilder<QuerySnapshot>(
-      stream: expenseModel.expensesRef.snapshots(),
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<QuerySnapshot> snapshot,
-      ) {
-        if (snapshot.hasError) {
-          return const Text('Something went wrong');
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
-        if (!snapshot.hasData) {
-          return Center(
-            child: Text(
-              'No expenses added yet!',
-              style: textStyle,
-            ),
-          );
-        }
-
-        return ListView.separated(
-          itemCount: snapshot.data?.docs.length ?? 0,
-          itemBuilder: (context, index) {
-            final docData = snapshot.data!.docs[index];
-            final String documentId = docData.reference.id;
-            final Map<String, dynamic> dataMap =
-                docData.data()! as Map<String, dynamic>;
-            final Expense item = Expense.fromMap(dataMap);
-
-            return ExpenseItem(
-              key: UniqueKey(),
-              documentId: documentId,
-              expense: item,
-              onDelete: (documentId) => onDelete(documentId),
-              onEdit: (documentId) => onEdit(Mode.edit, documentId, item),
-            );
-          },
-          separatorBuilder: (context, index) {
-            return const SizedBox(
-              height: 15,
-            );
-          },
+      if (expenses.isEmpty) {
+        return Center(
+          child: Text(
+            'No transactions added yet!',
+            style: textStyle,
+          ),
         );
-      },
-    );
+      }
+
+      return ListView.separated(
+        itemCount: expenses.length,
+        itemBuilder: (context, index) {
+          final item = expenses[index];
+          return ExpenseItem(
+            key: UniqueKey(),
+            index: index,
+            expense: item,
+            onDelete: (index) => onDelete(index, item),
+            onEdit: (index) => onEdit(Mode.edit, index, item),
+          );
+        },
+        separatorBuilder: (context, index) {
+          return const SizedBox(
+            height: 15,
+          );
+        },
+      );
+    });
   }
 }

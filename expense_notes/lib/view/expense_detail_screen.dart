@@ -1,4 +1,5 @@
 import 'package:expense_notes/model/expense.dart';
+import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
 
 class DetailScreenArguments {
@@ -14,7 +15,7 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final PlatformTheme theme = PlatformTheme(context);
 
     final args =
         ModalRoute.of(context)!.settings.arguments as DetailScreenArguments;
@@ -22,7 +23,7 @@ class DetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detail'),
-        backgroundColor: theme.primaryColor,
+        backgroundColor: theme.getPrimaryColor(),
       ),
       body: Center(
         child: Text(args.expense.name),

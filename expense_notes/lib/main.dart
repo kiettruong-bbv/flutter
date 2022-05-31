@@ -1,6 +1,8 @@
+import 'package:expense_notes/constants/storage_key.dart';
 import 'package:expense_notes/model/chart_model.dart';
 import 'package:expense_notes/model/expense_model.dart';
 import 'package:expense_notes/routes.dart';
+import 'package:expense_notes/service/expense_repository.dart';
 import 'package:expense_notes/style/theme_manager.dart';
 import 'package:expense_notes/view/expense_detail_screen.dart';
 import 'package:expense_notes/view/home_screen.dart';
@@ -8,7 +10,9 @@ import 'package:expense_notes/view/setting_screen.dart';
 import 'package:expense_notes/view/splash_screen.dart';
 import 'package:expense_notes/widget/platform_widget/platform_app.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -17,8 +21,10 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        Provider(create: (context) => ExpenseModel()),
-        Provider(create: (context) => ChartModel()),
+        ChangeNotifierProvider(
+          create: (context) => ExpenseModel(HttpExpenseRepository()),
+        ),
+        ChangeNotifierProvider(create: (context) => ChartModel()),
         ChangeNotifierProvider(create: (context) => ThemeManager()),
       ],
       child: const MyApp(),
@@ -45,6 +51,30 @@ class _MyAppState extends State<MyApp> {
 
   Future _initializeApp() async {
     await context.read<ThemeManager>().setupTheme();
+    await _authenticateFirebase();
+  }
+
+  Future _authenticateFirebase() async {
+    await FirebaseAuth.instance.signOut();
+
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: "test@gmail.com",
+        password: "123456",
+      );
+
+      final String? idToken = await userCredential.user?.getIdToken();
+      if (idToken != null) {
+        await LocalStorage(StorageKey.app).setItem(StorageKey.token, idToken);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+    }
   }
 
   @override

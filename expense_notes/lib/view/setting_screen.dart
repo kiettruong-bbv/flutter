@@ -3,7 +3,6 @@ import 'package:expense_notes/style/my_colors.dart';
 import 'package:expense_notes/style/theme_manager.dart';
 import 'package:expense_notes/widget/app_drawer.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

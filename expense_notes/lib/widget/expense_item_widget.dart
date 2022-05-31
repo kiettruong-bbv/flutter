@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:expense_notes/extension/date_extension.dart';
 import 'package:expense_notes/model/expense.dart';
 import 'package:expense_notes/routes.dart';
@@ -7,18 +6,18 @@ import 'package:expense_notes/view/expense_detail_screen.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
 
-typedef OnItemCallBack = Function(String documentId);
+typedef OnItemCallBack = Function(int index);
 
 class ExpenseItem extends StatelessWidget {
   const ExpenseItem({
     Key? key,
-    required this.documentId,
+    required this.index,
     required this.expense,
     required this.onDelete,
     required this.onEdit,
   }) : super(key: key);
 
-  final String documentId;
+  final int index;
   final Expense expense;
   final OnItemCallBack onDelete;
   final OnItemCallBack onEdit;
@@ -99,14 +98,14 @@ class ExpenseItem extends StatelessWidget {
               ),
             ),
             _buildIconButton(
-              onPressed: () => onEdit(documentId),
+              onPressed: () => onEdit(index),
               icon: const Icon(
                 Icons.edit,
                 color: Colors.blue,
               ),
             ),
             _buildIconButton(
-              onPressed: () => onDelete(documentId),
+              onPressed: () => onDelete(index),
               icon: const Icon(
                 Icons.delete,
                 color: Colors.red,

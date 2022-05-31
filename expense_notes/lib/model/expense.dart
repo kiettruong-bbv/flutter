@@ -1,31 +1,6 @@
 import 'dart:math';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_notes/extension/color_extension.dart';
 import 'package:flutter/material.dart';
-
-enum WeekDay { mon, tue, wed, thu, fri, sat, sun }
-
-extension CatExtension on WeekDay {
-  int get value {
-    switch (this) {
-      case WeekDay.mon:
-        return 1;
-      case WeekDay.tue:
-        return 2;
-      case WeekDay.wed:
-        return 3;
-      case WeekDay.thu:
-        return 4;
-      case WeekDay.fri:
-        return 5;
-      case WeekDay.sat:
-        return 6;
-      case WeekDay.sun:
-        return 7;
-    }
-  }
-}
 
 class Expense {
   late final String id;
@@ -64,7 +39,15 @@ class Expense {
         color = data['color'],
         name = data['name'],
         price = data['price'],
-        addTime = (data['addTime'] as Timestamp).toDate();
+        addTime = DateTime.fromMillisecondsSinceEpoch(data['addTime']);
+
+  Expense.fromFirestoreMap(Map<String, dynamic> data)
+      : id = data['fields']['id']['stringValue'],
+        color = data['fields']['color']['stringValue'],
+        name = data['fields']['name']['stringValue'],
+        price = int.parse(data['fields']['price']['integerValue']),
+        addTime = DateTime.fromMillisecondsSinceEpoch(
+            int.parse(data['fields']['addTime']['integerValue']));
 
   Map<String, dynamic> toMap() {
     return {
@@ -72,7 +55,19 @@ class Expense {
       'color': color,
       'name': name,
       'price': price,
-      'addTime': Timestamp.fromDate(addTime),
+      'addTime': addTime.millisecondsSinceEpoch,
+    };
+  }
+
+  Map<String, dynamic> toFirestoreMap() {
+    return {
+      'fields': {
+        'id': {'stringValue': id},
+        'color': {'stringValue': color},
+        'name': {'stringValue': name},
+        'price': {'integerValue': price},
+        'addTime': {'integerValue': addTime.millisecondsSinceEpoch},
+      },
     };
   }
 
