@@ -2,7 +2,7 @@ import 'package:expense_notes/extension/date_extension.dart';
 import 'package:expense_notes/model/expense.dart';
 import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/style/my_colors.dart';
-import 'package:expense_notes/view/expense_detail_screen.dart';
+import 'package:expense_notes/view/expense/expense_detail_screen.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
 

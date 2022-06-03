@@ -35,7 +35,8 @@ class MyTheme with ChangeNotifier {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          primary: Colors.white,
+          primary: MyColors.purple,
+          onSurface: Colors.black,
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(

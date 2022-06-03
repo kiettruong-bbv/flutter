@@ -1,7 +1,7 @@
 import 'package:expense_notes/extension/platform_extension.dart';
 import 'package:expense_notes/model/expense.dart';
 import 'package:expense_notes/model/expense_model.dart';
-import 'package:expense_notes/view/expense_add_screen.dart';
+import 'package:expense_notes/view/expense/expense_add_screen.dart';
 import 'package:expense_notes/widget/expense_item_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

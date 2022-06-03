@@ -13,6 +13,7 @@ class ExpenseModel extends ChangeNotifier {
 
   Future<List<Expense>> getAll() async {
     final List<Expense> expenses = await _expenseRepository.getAll();
+    _expenses.clear();
     _expenses.addAll(expenses);
     return expenses;
   }
@@ -33,7 +34,10 @@ class ExpenseModel extends ChangeNotifier {
   }
 
   Future updateItem(int index, Expense expense) async {
-    await _expenseRepository.update(expense.id, expense);
+    await _expenseRepository.update(
+      documentId: expense.id,
+      expense: expense,
+    );
 
     final String color = _expenses[index].color;
     _expenses[index] = Expense.full(
@@ -44,5 +48,9 @@ class ExpenseModel extends ChangeNotifier {
         addTime: expense.addTime);
 
     notifyListeners();
+  }
+
+  void clearData() {
+    _expenses.clear();
   }
 }

@@ -1,6 +1,7 @@
+import 'package:expense_notes/constants/storage_key.dart';
+import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/style/my_theme.dart';
-import 'package:expense_notes/view/expense_list_screen.dart';
-import 'package:expense_notes/view/home_screen.dart';
+import 'package:expense_notes/utils/storage_utils.dart';
 import 'package:expense_notes/widget/platform_widget/platform_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
       darkTheme: MyTheme.darkTheme,
       themeMode: themeMode,
       routes: routes,
-      home: const HomeScreen(),
+      initialRoute: _hasSignedIn() ? Routes.home : Routes.signIn,
     );
   }
 
@@ -52,7 +53,12 @@ class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
       ],
       theme: theme,
       routes: routes,
-      home: const HomeScreen(),
+      initialRoute: _hasSignedIn() ? Routes.home : Routes.signIn,
     );
+  }
+
+  bool _hasSignedIn() {
+    final String? auth = StorageUtils.getItem(StorageKey.auth);
+    return auth != null;
   }
 }

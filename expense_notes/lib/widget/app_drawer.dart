@@ -1,16 +1,37 @@
+import 'dart:convert';
+
+import 'package:expense_notes/constants/storage_key.dart';
+import 'package:expense_notes/model/expense_model.dart';
+import 'package:expense_notes/model/response/auth_response.dart';
 import 'package:expense_notes/routes.dart';
+import 'package:expense_notes/utils/storage_utils.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-enum Section { home, settings }
+enum Section { home, settings, logout }
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
   final Section current;
 
   const AppDrawer({
     Key? key,
     required this.current,
   }) : super(key: key);
+
+  @override
+  State<AppDrawer> createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  late final AuthResponse _auth;
+
+  @override
+  void initState() {
+    final String authData = StorageUtils.getItem(StorageKey.auth);
+    _auth = AuthResponse.fromMap(jsonDecode(authData));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +47,23 @@ class AppDrawer extends StatelessWidget {
               color: theme.getPrimaryColor(),
             ),
             child: Center(
-              child: Text(
-                'Expense Notes',
-                style: theme.getDrawerTitle(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Expense Notes',
+                    style: theme.getDrawerTitle(),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    _auth.email,
+                    style: const TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -41,6 +76,11 @@ class AppDrawer extends StatelessWidget {
             context: context,
             title: 'Settings',
             onTap: () => _navigateToSection(context, Section.settings),
+          ),
+          _buildDrawerItem(
+            context: context,
+            title: 'Log out',
+            onTap: () => _navigateToSection(context, Section.logout),
           ),
         ],
       ),
@@ -68,8 +108,8 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  void _navigateToSection(BuildContext context, Section section) {
-    if (current == section) {
+  Future _navigateToSection(BuildContext context, Section section) async {
+    if (widget.current == section) {
       return;
     }
     switch (section) {
@@ -79,6 +119,17 @@ class AppDrawer extends StatelessWidget {
       case Section.settings:
         Navigator.pushReplacementNamed(context, Routes.setting);
         break;
+      case Section.logout:
+        await _signOutUser(context);
+        break;
     }
+  }
+
+  Future _signOutUser(BuildContext context) async {
+    await StorageUtils.deleteItem(StorageKey.auth);
+
+    context.read<ExpenseModel>().clearData();
+
+    Navigator.pushReplacementNamed(context, Routes.signIn);
   }
 }

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_notes/constants/firebase_const.dart';
 import 'package:expense_notes/constants/storage_key.dart';
 import 'package:expense_notes/model/expense.dart';
+import 'package:expense_notes/model/response/auth_response.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:http/http.dart' as http;
 
@@ -12,7 +13,10 @@ abstract class IExpenseRepository {
   Future<List<Expense>> getAll();
   Future create(Expense expense);
   Future delete(String documentId);
-  Future update(String documentId, Expense expense);
+  Future update({
+    required String documentId,
+    required Expense expense,
+  });
 }
 
 class RefExpenseRepository implements IExpenseRepository {
@@ -44,17 +48,24 @@ class RefExpenseRepository implements IExpenseRepository {
   }
 
   @override
-  Future update(String documentId, Expense expense) async {
+  Future update({
+    required String documentId,
+    required Expense expense,
+  }) async {
     await _ref.doc(documentId).update(expense.toMap());
   }
 }
 
 class HttpExpenseRepository implements IExpenseRepository {
   final String path = '${FirebaseConst.firestoreBaseUrl}expenses';
-  final String _token;
+  late final String _token;
 
-  HttpExpenseRepository()
-      : _token = LocalStorage(StorageKey.app).getItem(StorageKey.token);
+  HttpExpenseRepository() {
+    final authData = jsonDecode(
+      LocalStorage(StorageKey.app).getItem(StorageKey.auth),
+    ) as Map<String, dynamic>;
+    _token = AuthResponse.fromMap(authData).idToken;
+  }
 
   @override
   Future<Expense> get(String documentId) async {
@@ -109,7 +120,10 @@ class HttpExpenseRepository implements IExpenseRepository {
   }
 
   @override
-  Future update(String documentId, Expense expense) async {
+  Future update({
+    required String documentId,
+    required Expense expense,
+  }) async {
     await http.patch(
       Uri.parse(path + '/$documentId'),
       headers: <String, String>{

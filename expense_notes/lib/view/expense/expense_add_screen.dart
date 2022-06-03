@@ -183,7 +183,6 @@ class _AddExpenseState extends State<AddExpense> {
 
           SizedBox(
             width: double.infinity,
-            height: 44,
             child: PlatformButton(
               onPressed: _isSubmitEnable ? _submitExpense : null,
               child: Text(
