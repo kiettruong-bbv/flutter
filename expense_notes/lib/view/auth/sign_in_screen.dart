@@ -60,6 +60,7 @@ class _SignInScreenState extends State<SignInScreen> {
           TextField(
             controller: _emailController,
             style: theme.getDefaultTextStyle()?.copyWith(
+                  color: Colors.black,
                   fontSize: 16,
                   textBaseline: TextBaseline.alphabetic,
                 ),
@@ -85,6 +86,7 @@ class _SignInScreenState extends State<SignInScreen> {
           TextField(
             controller: _passwordController,
             style: theme.getDefaultTextStyle()?.copyWith(
+                  color: Colors.black,
                   fontSize: 16,
                   textBaseline: TextBaseline.alphabetic,
                 ),

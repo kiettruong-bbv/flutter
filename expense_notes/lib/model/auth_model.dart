@@ -4,6 +4,7 @@ import 'package:expense_notes/constants/storage_key.dart';
 import 'package:expense_notes/model/expense_model.dart';
 import 'package:expense_notes/model/response/auth_response.dart';
 import 'package:expense_notes/service/auth_repository.dart';
+import 'package:expense_notes/style/theme_manager.dart';
 import 'package:expense_notes/utils/storage_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -51,6 +52,7 @@ class AuthModel with ChangeNotifier {
   Future signOut(BuildContext context) async {
     await StorageUtils.deleteItem(StorageKey.auth);
     context.read<ExpenseModel>().clearData();
+    context.read<ThemeManager>().toggleTheme(ThemeMode.light);
     _isSignedIn = false;
     notifyListeners();
   }

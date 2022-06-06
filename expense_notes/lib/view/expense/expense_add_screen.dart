@@ -1,4 +1,5 @@
 import 'package:expense_notes/extension/platform_extension.dart';
+import 'package:expense_notes/style/my_colors.dart';
 import 'package:expense_notes/widget/platform_widget/platform_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -62,8 +63,6 @@ class _AddExpenseState extends State<AddExpense> {
         ? Theme.of(context).scaffoldBackgroundColor
         : CupertinoTheme.of(context).scaffoldBackgroundColor;
 
-    Color backgroundAccentColor = Theme.of(context).colorScheme.onSecondary;
-
     Color primaryColor = isAndroid()
         ? Theme.of(context).primaryColor
         : CupertinoTheme.of(context).primaryColor;
@@ -119,9 +118,9 @@ class _AddExpenseState extends State<AddExpense> {
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.all(10),
               border: const OutlineInputBorder(),
-              enabledBorder: OutlineInputBorder(
+              enabledBorder: const OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: backgroundAccentColor,
+                  color: MyColors.grey,
                   width: 1,
                 ),
               ),
@@ -150,9 +149,9 @@ class _AddExpenseState extends State<AddExpense> {
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.all(10),
               border: const OutlineInputBorder(),
-              enabledBorder: OutlineInputBorder(
+              enabledBorder: const OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: backgroundAccentColor,
+                  color: MyColors.grey,
                   width: 1,
                 ),
               ),

@@ -30,7 +30,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: theme.colorScheme.onSecondary,
+          color: Colors.grey,
           width: 1,
         ),
         borderRadius: const BorderRadius.all(

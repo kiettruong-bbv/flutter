@@ -64,6 +64,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           TextField(
             controller: _emailController,
             style: theme.getDefaultTextStyle()?.copyWith(
+                  color: Colors.black,
                   fontSize: 16,
                   textBaseline: TextBaseline.alphabetic,
                 ),
@@ -89,6 +90,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           TextField(
             controller: _passwordController,
             style: theme.getDefaultTextStyle()?.copyWith(
+                  color: Colors.black,
                   fontSize: 16,
                   textBaseline: TextBaseline.alphabetic,
                 ),
