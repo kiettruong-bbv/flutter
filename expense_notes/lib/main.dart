@@ -1,6 +1,8 @@
+import 'package:expense_notes/model/auth_model.dart';
 import 'package:expense_notes/model/chart_model.dart';
 import 'package:expense_notes/model/expense_model.dart';
 import 'package:expense_notes/routes.dart';
+import 'package:expense_notes/service/auth_repository.dart';
 import 'package:expense_notes/service/expense_repository.dart';
 import 'package:expense_notes/style/theme_manager.dart';
 import 'package:expense_notes/view/auth/sign_in_screen.dart';
@@ -20,6 +22,9 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(
+          create: (context) => AuthModel(HttpAuthRepository()),
+        ),
         ChangeNotifierProvider(
           create: (context) => ExpenseModel(HttpExpenseRepository()),
         ),
@@ -50,6 +55,7 @@ class _MyAppState extends State<MyApp> {
 
   Future _initializeApp() async {
     await context.read<ThemeManager>().setupTheme();
+    context.read<AuthModel>().checkIfUserSignedIn();
   }
 
   @override
@@ -58,18 +64,20 @@ class _MyAppState extends State<MyApp> {
       future: _initFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Consumer<ThemeManager>(
-            builder: (context, themeManager, widget) {
+          return Consumer2<ThemeManager, AuthModel>(
+            builder: (context, themeManager, authModel, _) {
               return PlatformApp(
-                themeMode: context.read<ThemeManager>().currentTheme,
+                themeMode: themeManager.currentTheme,
                 routes: {
-                  Routes.root: (context) => SignInScreen(),
-                  Routes.signIn: (context) => SignInScreen(),
-                  Routes.signUp: (context) => SignUpScreen(),
+                  Routes.signIn: (context) => const SignInScreen(),
+                  Routes.signUp: (context) => const SignUpScreen(),
                   Routes.home: (context) => const HomeScreen(),
                   Routes.setting: (context) => const SettingScreen(),
                   Routes.detail: (context) => const DetailScreen(),
                 },
+                home: authModel.isSignedIn
+                    ? const HomeScreen()
+                    : const SignInScreen(),
               );
             },
           );

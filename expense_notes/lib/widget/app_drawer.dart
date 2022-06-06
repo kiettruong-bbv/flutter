@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:expense_notes/constants/storage_key.dart';
-import 'package:expense_notes/model/expense_model.dart';
+import 'package:expense_notes/model/auth_model.dart';
 import 'package:expense_notes/model/response/auth_response.dart';
 import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/utils/storage_utils.dart';
@@ -126,10 +126,6 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Future _signOutUser(BuildContext context) async {
-    await StorageUtils.deleteItem(StorageKey.auth);
-
-    context.read<ExpenseModel>().clearData();
-
-    Navigator.pushReplacementNamed(context, Routes.signIn);
+    context.read<AuthModel>().signOut(context);
   }
 }

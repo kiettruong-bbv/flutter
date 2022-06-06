@@ -1,7 +1,4 @@
-import 'package:expense_notes/constants/storage_key.dart';
-import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/style/my_theme.dart';
-import 'package:expense_notes/utils/storage_utils.dart';
 import 'package:expense_notes/widget/platform_widget/platform_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,11 +7,13 @@ import 'package:flutter/scheduler.dart';
 class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
   final Map<String, WidgetBuilder> routes;
   final ThemeMode themeMode;
+  final Widget home;
 
   const PlatformApp({
     Key? key,
     required this.themeMode,
     required this.routes,
+    required this.home,
   }) : super(key: key);
 
   @override
@@ -25,7 +24,7 @@ class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
       darkTheme: MyTheme.darkTheme,
       themeMode: themeMode,
       routes: routes,
-      initialRoute: _hasSignedIn() ? Routes.home : Routes.signIn,
+      home: home,
     );
   }
 
@@ -53,12 +52,7 @@ class PlatformApp extends PlatformWidget<CupertinoApp, MaterialApp> {
       ],
       theme: theme,
       routes: routes,
-      initialRoute: _hasSignedIn() ? Routes.home : Routes.signIn,
+      home: home,
     );
-  }
-
-  bool _hasSignedIn() {
-    final String? auth = StorageUtils.getItem(StorageKey.auth);
-    return auth != null;
   }
 }

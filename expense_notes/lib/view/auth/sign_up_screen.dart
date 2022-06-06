@@ -1,16 +1,13 @@
-import 'package:expense_notes/model/response/auth_response.dart';
-import 'package:expense_notes/routes.dart';
-import 'package:expense_notes/service/auth_repository.dart';
+import 'package:expense_notes/model/auth_model.dart';
 import 'package:expense_notes/style/my_colors.dart';
 import 'package:expense_notes/widget/platform_widget/platform_button.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
-  final IAuthRepository authRepository = HttpAuthRepository();
-
-  SignUpScreen({Key? key}) : super(key: key);
+  const SignUpScreen({Key? key}) : super(key: key);
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -141,14 +138,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() {
       _isLoading = true;
     });
-    final AuthResponse? response = await widget.authRepository.signUp(
+    final AuthModel authModel = context.read<AuthModel>();
+    final bool signUpResult = await authModel.signUp(
       email: _emailController.text,
       password: _passwordController.text,
     );
     setState(() {
       _isLoading = false;
     });
-    if (response != null) {
+    if (signUpResult) {
       _showSignUpSuccessDialog();
     } else {
       await Fluttertoast.showToast(msg: 'Sign up failed.');
@@ -174,13 +172,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void _showSignUpSuccessDialog() {
     showDialog<String>(
       context: context,
+      useRootNavigator: false,
       builder: (BuildContext context) => AlertDialog(
         title: const Text('Sign up successfully.'),
         content: const Text('Please sign in to start using app.'),
         actions: <Widget>[
           TextButton(
-            onPressed: () =>
-                Navigator.popUntil(context, ModalRoute.withName(Routes.signIn)),
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
             child: const Text(
               'OK',
               style: TextStyle(color: MyColors.primary),

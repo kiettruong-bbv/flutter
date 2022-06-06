@@ -1,20 +1,14 @@
-import 'dart:convert';
-
-import 'package:expense_notes/constants/storage_key.dart';
-import 'package:expense_notes/model/response/auth_response.dart';
+import 'package:expense_notes/model/auth_model.dart';
 import 'package:expense_notes/routes.dart';
-import 'package:expense_notes/service/auth_repository.dart';
 import 'package:expense_notes/style/my_colors.dart';
-import 'package:expense_notes/utils/storage_utils.dart';
 import 'package:expense_notes/widget/platform_widget/platform_button.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 class SignInScreen extends StatefulWidget {
-  final IAuthRepository authRepository = HttpAuthRepository();
-
-  SignInScreen({
+  const SignInScreen({
     Key? key,
   }) : super(key: key);
 
@@ -156,20 +150,15 @@ class _SignInScreenState extends State<SignInScreen> {
     setState(() {
       _isLoading = true;
     });
-    final AuthResponse? auth = await widget.authRepository.signIn(
+    final AuthModel authModel = context.read<AuthModel>();
+    final bool signInResult = await authModel.signIn(
       email: _emailController.text,
       password: _passwordController.text,
     );
     setState(() {
       _isLoading = false;
     });
-    if (auth != null) {
-      await StorageUtils.setItem(
-        StorageKey.auth,
-        jsonEncode(auth.toMap()),
-      );
-      Navigator.pushReplacementNamed(context, Routes.home);
-    } else {
+    if (!signInResult) {
       await Fluttertoast.showToast(msg: 'Sign in failed.');
     }
   }
