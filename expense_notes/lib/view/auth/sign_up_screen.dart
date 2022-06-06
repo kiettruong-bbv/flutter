@@ -1,9 +1,11 @@
 import 'package:expense_notes/model/response/auth_response.dart';
+import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/service/auth_repository.dart';
 import 'package:expense_notes/style/my_colors.dart';
 import 'package:expense_notes/widget/platform_widget/platform_button.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SignUpScreen extends StatefulWidget {
   final IAuthRepository authRepository = HttpAuthRepository();
@@ -120,7 +122,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               borderRadius: BorderRadius.circular(18),
               onPressed: _isSubmitEnable ? _signUpUser : null,
               child: Text(
-                'Sign In',
+                'Sign Up',
                 style: theme.getButtonTextStyle()?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -143,8 +145,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
       email: _emailController.text,
       password: _passwordController.text,
     );
+    setState(() {
+      _isLoading = false;
+    });
     if (response != null) {
-      Navigator.pop(context);
+      _showSignUpSuccessDialog();
+    } else {
+      await Fluttertoast.showToast(msg: 'Sign up failed.');
     }
   }
 
@@ -162,5 +169,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _isSubmitEnable = false;
       });
     }
+  }
+
+  void _showSignUpSuccessDialog() {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Sign up successfully.'),
+        content: const Text('Please sign in to start using app.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () =>
+                Navigator.popUntil(context, ModalRoute.withName(Routes.signIn)),
+            child: const Text(
+              'OK',
+              style: TextStyle(color: MyColors.primary),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

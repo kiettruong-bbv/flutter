@@ -9,6 +9,7 @@ import 'package:expense_notes/utils/storage_utils.dart';
 import 'package:expense_notes/widget/platform_widget/platform_button.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SignInScreen extends StatefulWidget {
   final IAuthRepository authRepository = HttpAuthRepository();
@@ -37,8 +38,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    PlatformTheme theme = PlatformTheme(context);
-
     return Scaffold(
       body: _buildSignInForm(context),
     );
@@ -170,6 +169,8 @@ class _SignInScreenState extends State<SignInScreen> {
         jsonEncode(auth.toMap()),
       );
       Navigator.pushReplacementNamed(context, Routes.home);
+    } else {
+      await Fluttertoast.showToast(msg: 'Sign in failed.');
     }
   }
 

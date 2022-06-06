@@ -31,7 +31,7 @@ class PlatformButton extends PlatformWidget<CupertinoButton, ElevatedButton> {
             ),
           ),
       onPressed: onPressed,
-      child: isLoading ? _loadingIndicator() : child,
+      child: isLoading ? _loadingIndicator(Colors.white) : child,
     );
   }
 
@@ -41,16 +41,16 @@ class PlatformButton extends PlatformWidget<CupertinoButton, ElevatedButton> {
       color: backgroundColor,
       disabledColor: MyColors.grey,
       onPressed: onPressed,
-      child: isLoading ? _loadingIndicator() : child,
+      child: isLoading ? _loadingIndicator(MyColors.primary) : child,
     );
   }
 
-  Widget _loadingIndicator() {
-    return const SizedBox(
+  Widget _loadingIndicator(Color color) {
+    return SizedBox(
       width: 20,
       height: 20,
       child: CircularProgressIndicator(
-        color: Colors.white,
+        color: color,
       ),
     );
   }
