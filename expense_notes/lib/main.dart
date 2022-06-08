@@ -1,9 +1,13 @@
+import 'package:dio/dio.dart';
+import 'package:expense_notes/api/auth_api.dart';
+import 'package:expense_notes/api/expense_api.dart';
 import 'package:expense_notes/model/auth_model.dart';
 import 'package:expense_notes/model/chart_model.dart';
 import 'package:expense_notes/model/expense_model.dart';
+import 'package:expense_notes/repository/auth_repository.dart';
+import 'package:expense_notes/repository/expense_repository.dart';
 import 'package:expense_notes/routes.dart';
-import 'package:expense_notes/service/auth_repository.dart';
-import 'package:expense_notes/service/expense_repository.dart';
+import 'package:expense_notes/services/dio_client.dart';
 import 'package:expense_notes/style/theme_manager.dart';
 import 'package:expense_notes/view/auth/sign_in_screen.dart';
 import 'package:expense_notes/view/auth/sign_up_screen.dart';
@@ -19,14 +23,26 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  final dio = Dio();
+  final dioClient = DioClient(dio);
+
+  final authRepository = HttpAuthRepository(
+    authApi: AuthApi(dioClient: dioClient),
+  );
+
+  final expenseRepository = HttpExpenseRepository(
+    expenseApi: ExpenseApi(dioClient: dioClient),
+  );
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => AuthModel(HttpAuthRepository()),
+          create: (context) => AuthModel(authRepository),
         ),
         ChangeNotifierProvider(
-          create: (context) => ExpenseModel(HttpExpenseRepository()),
+          create: (context) => ExpenseModel(expenseRepository),
         ),
         ChangeNotifierProvider(create: (context) => ChartModel()),
         ChangeNotifierProvider(create: (context) => ThemeManager()),

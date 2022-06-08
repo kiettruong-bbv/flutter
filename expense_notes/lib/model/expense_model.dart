@@ -1,6 +1,6 @@
 import 'dart:collection';
 import 'package:expense_notes/model/expense.dart';
-import 'package:expense_notes/service/expense_repository.dart';
+import 'package:expense_notes/repository/expense_repository.dart';
 import 'package:flutter/material.dart';
 
 class ExpenseModel extends ChangeNotifier {

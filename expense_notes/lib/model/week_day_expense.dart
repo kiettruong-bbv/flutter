@@ -35,10 +35,10 @@ class WeekDayExpense {
   WeekDayExpense.fromMap(Map<String, dynamic> data)
       : weekDay = WeekDay.values.firstWhere((e) => e.value == data['weekDay']),
         expenses = List<Expense>.from(
-            data['expenses'].map((model) => Expense.fromMap(model)));
+            data['expenses'].map((model) => Expense.fromJson(model)));
 
   Map<String, dynamic> toMap() {
-    final expensesMap = expenses.map((e) => e.toMap()).toList();
+    final expensesMap = expenses.map((e) => e.toJson()).toList();
     return {
       'weekDay': weekDay.value,
       'expenses': expensesMap,

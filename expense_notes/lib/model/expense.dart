@@ -34,14 +34,14 @@ class Expense {
         price = expense.price,
         addTime = expense.addTime;
 
-  Expense.fromMap(Map<String, dynamic> data)
+  Expense.fromJson(Map<String, dynamic> data)
       : id = data['id'],
         color = data['color'],
         name = data['name'],
         price = data['price'],
         addTime = DateTime.fromMillisecondsSinceEpoch(data['addTime']);
 
-  Expense.fromFirestoreMap(Map<String, dynamic> data)
+  Expense.fromFirestoreJson(Map<String, dynamic> data)
       : id = data['fields']['id']['stringValue'],
         color = data['fields']['color']['stringValue'],
         name = data['fields']['name']['stringValue'],
@@ -49,7 +49,7 @@ class Expense {
         addTime = DateTime.fromMillisecondsSinceEpoch(
             int.parse(data['fields']['addTime']['integerValue']));
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'color': color,
@@ -59,7 +59,7 @@ class Expense {
     };
   }
 
-  Map<String, dynamic> toFirestoreMap() {
+  Map<String, dynamic> toFirestoreJson() {
     return {
       'fields': {
         'id': {'stringValue': id},

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:expense_notes/constants/storage_key.dart';
 import 'package:expense_notes/model/auth_model.dart';
-import 'package:expense_notes/model/response/auth_response.dart';
+import 'package:expense_notes/model/auth_response.dart';
 import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/utils/storage_utils.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
@@ -29,7 +29,7 @@ class _AppDrawerState extends State<AppDrawer> {
   @override
   void initState() {
     final String authData = StorageUtils.getItem(StorageKey.auth);
-    _auth = AuthResponse.fromMap(jsonDecode(authData));
+    _auth = AuthResponse.fromJson(jsonDecode(authData));
     super.initState();
   }
 

@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:expense_notes/constants/storage_key.dart';
 import 'package:expense_notes/model/expense_model.dart';
-import 'package:expense_notes/model/response/auth_response.dart';
-import 'package:expense_notes/service/auth_repository.dart';
+import 'package:expense_notes/model/auth_response.dart';
+import 'package:expense_notes/repository/auth_repository.dart';
 import 'package:expense_notes/style/theme_manager.dart';
 import 'package:expense_notes/utils/storage_utils.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +30,7 @@ class AuthModel with ChangeNotifier {
       _isSignedIn = true;
       await StorageUtils.setItem(
         StorageKey.auth,
-        jsonEncode(auth.toMap()),
+        jsonEncode(auth.toJson()),
       );
       notifyListeners();
       return true;
@@ -59,6 +59,8 @@ class AuthModel with ChangeNotifier {
 
   void checkIfUserSignedIn() {
     final String? auth = StorageUtils.getItem(StorageKey.auth);
+    print('>>>');
+    print(auth);
     _isSignedIn = auth != null;
   }
 }
