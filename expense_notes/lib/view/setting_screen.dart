@@ -1,10 +1,10 @@
-import 'package:expense_notes/extension/platform_extension.dart';
+import 'package:expense_notes/bloc/theme/theme_cubit.dart';
+import 'package:expense_notes/bloc/theme/theme_state.dart';
 import 'package:expense_notes/style/my_colors.dart';
-import 'package:expense_notes/style/theme_manager.dart';
 import 'package:expense_notes/widget/app_drawer.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({Key? key}) : super(key: key);
@@ -14,6 +14,14 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
+  late ThemeCubit _themeCubit;
+
+  @override
+  void initState() {
+    _themeCubit = BlocProvider.of<ThemeCubit>(context);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     PlatformTheme theme = PlatformTheme(context);
@@ -86,33 +94,34 @@ class _SettingScreenState extends State<SettingScreen> {
     required BuildContext context,
     required ThemeMode mode,
   }) {
-    ThemeManager themeManager = context.watch<ThemeManager>();
     PlatformTheme theme = PlatformTheme(context);
 
-    return Theme(
-      data: Theme.of(context).copyWith(
-        unselectedWidgetColor: MyColors.grey,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Radio<ThemeMode>(
-            activeColor: theme.getPrimaryColor(),
-            value: mode,
-            groupValue: themeManager.currentTheme,
-            onChanged: (ThemeMode? newTheme) {
-              if (newTheme != null) {
-                themeManager.toggleTheme(newTheme);
-              }
-            },
-          ),
-          Text(
-            mode.name,
-            style: theme.getDefaultTextStyle(),
-          ),
-        ],
-      ),
-    );
+    return BlocBuilder<ThemeCubit, ThemeState>(builder: (context, state) {
+      return Theme(
+        data: Theme.of(context).copyWith(
+          unselectedWidgetColor: MyColors.grey,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Radio<ThemeMode>(
+              activeColor: theme.getPrimaryColor(),
+              value: mode,
+              groupValue: _themeCubit.currentTheme,
+              onChanged: (ThemeMode? newTheme) {
+                if (newTheme != null) {
+                  _themeCubit.toggleTheme(newTheme);
+                }
+              },
+            ),
+            Text(
+              mode.name,
+              style: theme.getDefaultTextStyle(),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

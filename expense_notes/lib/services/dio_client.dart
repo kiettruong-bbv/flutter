@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:expense_notes/constants/app_const.dart';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 
@@ -17,10 +16,10 @@ class DioClient {
   }) {
     _dio = dio;
     _dio
-      ..options.connectTimeout = _defaultConnectTimeout
-      ..options.receiveTimeout = _defaultReceiveTimeout
+      ..options.connectTimeout = 60 * 1000
+      ..options.receiveTimeout = 60 * 1000
       ..httpClientAdapter
-      ..options.headers = {'Content-Type': 'application/json; charset=UTF-8'};
+      ..options.headers = {'Content-Type': 'application/json'};
     if (interceptors?.isNotEmpty ?? false) {
       _dio.interceptors.addAll(interceptors ?? []);
     }
@@ -31,7 +30,7 @@ class DioClient {
         requestHeader: true,
         responseHeader: false,
         request: false,
-        requestBody: false,
+        requestBody: true,
       ));
     }
   }

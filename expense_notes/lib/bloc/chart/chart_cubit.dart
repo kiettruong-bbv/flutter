@@ -1,10 +1,10 @@
-import 'dart:collection';
+import 'package:expense_notes/bloc/chart/chart_state.dart';
 import 'package:expense_notes/model/expense.dart';
 import 'package:expense_notes/model/week_day_expense.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ChartModel extends ChangeNotifier {
+class ChartCubit extends Cubit<ChartState> {
   List<WeekDayExpense> _weekDayDatas = [
     WeekDayExpense(weekDay: WeekDay.mon, expenses: []),
     WeekDayExpense(weekDay: WeekDay.tue, expenses: []),
@@ -15,10 +15,7 @@ class ChartModel extends ChangeNotifier {
     WeekDayExpense(weekDay: WeekDay.sun, expenses: []),
   ];
 
-  List<BarChartGroupData> _chartData = [];
-
-  UnmodifiableListView<BarChartGroupData> get chartData =>
-      UnmodifiableListView(_chartData);
+  ChartCubit() : super(ChartInitial());
 
   void addChart(Expense expense) {
     _addChart(expense);
@@ -65,7 +62,8 @@ class ChartModel extends ChangeNotifier {
   }
 
   void populateChart() {
-    _chartData = _weekDayDatas.asMap().entries.map((entry) {
+    final List<BarChartGroupData> chartData =
+        _weekDayDatas.asMap().entries.map((entry) {
       WeekDayExpense trans = entry.value;
       double toY = (trans.expenses.length / _weekDayDatas.length) * 10;
       return BarChartGroupData(
@@ -78,7 +76,7 @@ class ChartModel extends ChangeNotifier {
       );
     }).toList();
 
-    notifyListeners();
+    emit(ChartUpdated(chartData: chartData));
   }
 
   void _addChart(Expense expense) {

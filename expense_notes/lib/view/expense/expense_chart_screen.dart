@@ -1,7 +1,8 @@
-import 'package:expense_notes/model/chart_model.dart';
+import 'package:expense_notes/bloc/chart/chart_cubit.dart';
+import 'package:expense_notes/bloc/chart/chart_state.dart';
 import 'package:expense_notes/widget/chart.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ExpenseChartScreen extends StatelessWidget {
   const ExpenseChartScreen({Key? key}) : super(key: key);
@@ -33,13 +34,13 @@ class ExpenseChartScreen extends StatelessWidget {
   }
 
   Widget _buildChart(BuildContext context) {
-    return Consumer<ChartModel>(
-      builder: ((context, value, child) {
-        if ((value.chartData.isEmpty)) {
-          return _buildEmptyChart();
+    return BlocBuilder<ChartCubit, ChartState>(
+      builder: (context, state) {
+        if (state is ChartUpdated) {
+          return MyBarChart(barGroups: state.chartData);
         }
-        return MyBarChart(barGroups: value.chartData);
-      }),
+        return _buildEmptyChart();
+      },
     );
   }
 

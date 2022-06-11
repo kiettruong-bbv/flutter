@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:expense_notes/constants/app_const.dart';
 import 'package:expense_notes/constants/firebase_const.dart';
-import 'package:expense_notes/model/auth_response.dart';
+import 'package:expense_notes/model/auth.dart';
 import 'package:expense_notes/model/expense.dart';
 import 'package:expense_notes/services/dio_client.dart';
 
@@ -25,7 +25,7 @@ class ExpenseApi implements IExpenseApi {
 
   @override
   Future<Response> get(String documentId) async {
-    final String token = AuthResponse.getIdToken() ?? '';
+    final String token = await AuthResponse.getIdToken() ?? '';
     try {
       final String uri = FirebaseConst.firestoreBaseUrl + '/$documentId';
       final response = await dioClient.get(
@@ -45,7 +45,7 @@ class ExpenseApi implements IExpenseApi {
 
   @override
   Future<Response> getAll() async {
-    final String token = AuthResponse.getIdToken() ?? '';
+    final String token = await AuthResponse.getIdToken() ?? '';
     try {
       final response = await dioClient.get(
         FirebaseConst.firestoreBaseUrl,
@@ -64,7 +64,7 @@ class ExpenseApi implements IExpenseApi {
 
   @override
   Future<Response> create(Expense expense) async {
-    final String token = AuthResponse.getIdToken() ?? '';
+    final String token = await AuthResponse.getIdToken() ?? '';
     try {
       final String uri =
           FirebaseConst.firestoreBaseUrl + '?documentId=${expense.id}';
@@ -86,7 +86,7 @@ class ExpenseApi implements IExpenseApi {
 
   @override
   Future<Response> delete(String documentId) async {
-    final String token = AuthResponse.getIdToken() ?? '';
+    final String token = await AuthResponse.getIdToken() ?? '';
     try {
       final String uri = FirebaseConst.firestoreBaseUrl + '/$documentId';
       final response = await dioClient.delete(
@@ -109,7 +109,7 @@ class ExpenseApi implements IExpenseApi {
     required String documentId,
     required Expense expense,
   }) async {
-    final String token = AuthResponse.getIdToken() ?? '';
+    final String token = await AuthResponse.getIdToken() ?? '';
     try {
       final String uri = FirebaseConst.firestoreBaseUrl + '/$documentId';
       final response = await dioClient.patch(

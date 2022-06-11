@@ -35,8 +35,8 @@ class AuthResponse {
     };
   }
 
-  static String? getIdToken() {
-    final String? authString = StorageUtils.getItem(StorageKey.auth);
+  static Future<String?> getIdToken() async {
+    final String? authString = await StorageUtils.getItem(StorageKey.auth);
     if (authString != null) {
       final Map<String, dynamic> authData = jsonDecode(authString);
       return AuthResponse.fromJson(authData).idToken;

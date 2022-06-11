@@ -1,14 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:expense_notes/api/auth_api.dart';
 import 'package:expense_notes/api/expense_api.dart';
-import 'package:expense_notes/model/auth_model.dart';
-import 'package:expense_notes/model/chart_model.dart';
-import 'package:expense_notes/model/expense_model.dart';
+import 'package:expense_notes/bloc/chart/chart_cubit.dart';
+import 'package:expense_notes/bloc/expense/expense_list_cubit.dart';
+import 'package:expense_notes/bloc/root/root_cubit.dart';
+import 'package:expense_notes/bloc/root/root_state.dart';
+import 'package:expense_notes/bloc/signIn/sign_in_cubit.dart';
+import 'package:expense_notes/bloc/signUp/sign_up_cubit.dart';
+import 'package:expense_notes/bloc/theme/theme_cubit.dart';
+import 'package:expense_notes/bloc/theme/theme_state.dart';
 import 'package:expense_notes/repository/auth_repository.dart';
 import 'package:expense_notes/repository/expense_repository.dart';
 import 'package:expense_notes/routes.dart';
 import 'package:expense_notes/services/dio_client.dart';
-import 'package:expense_notes/style/theme_manager.dart';
 import 'package:expense_notes/view/auth/sign_in_screen.dart';
 import 'package:expense_notes/view/auth/sign_up_screen.dart';
 import 'package:expense_notes/view/expense/expense_detail_screen.dart';
@@ -18,7 +22,7 @@ import 'package:expense_notes/view/splash_screen.dart';
 import 'package:expense_notes/widget/platform_widget/platform_app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,16 +40,26 @@ void main() async {
   );
 
   runApp(
-    MultiProvider(
+    MultiBlocProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (context) => AuthModel(authRepository),
+        BlocProvider<RootCubit>(
+          create: (context) => RootCubit(),
         ),
-        ChangeNotifierProvider(
-          create: (context) => ExpenseModel(expenseRepository),
+        BlocProvider<ThemeCubit>(
+          create: (context) => ThemeCubit()..initTheme(),
         ),
-        ChangeNotifierProvider(create: (context) => ChartModel()),
-        ChangeNotifierProvider(create: (context) => ThemeManager()),
+        BlocProvider<SignInCubit>(
+          create: (context) => SignInCubit(authRepository),
+        ),
+        BlocProvider<SignUpCubit>(
+          create: (context) => SignUpCubit(authRepository),
+        ),
+        BlocProvider<ExpenseListCubit>(
+          create: (context) => ExpenseListCubit(expenseRepository),
+        ),
+        BlocProvider<ChartCubit>(
+          create: (context) => ChartCubit(),
+        )
       ],
       child: const MyApp(),
     ),
@@ -61,45 +75,40 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Routes routes = Routes();
-  late Future _initFuture;
 
   @override
   void initState() {
+    BlocProvider.of<RootCubit>(context).initRoot();
     super.initState();
-    _initFuture = _initializeApp();
-  }
-
-  Future _initializeApp() async {
-    await context.read<ThemeManager>().setupTheme();
-    context.read<AuthModel>().checkIfUserSignedIn();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _initFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return Consumer2<ThemeManager, AuthModel>(
-            builder: (context, themeManager, authModel, _) {
-              return PlatformApp(
-                themeMode: themeManager.currentTheme,
-                routes: {
-                  Routes.signIn: (context) => const SignInScreen(),
-                  Routes.signUp: (context) => const SignUpScreen(),
-                  Routes.home: (context) => const HomeScreen(),
-                  Routes.setting: (context) => const SettingScreen(),
-                  Routes.detail: (context) => const DetailScreen(),
-                },
-                home: authModel.isSignedIn
-                    ? const HomeScreen()
-                    : const SignInScreen(),
-              );
-            },
-          );
-        } else {
-          return const SplashScreen();
-        }
+    return BlocBuilder<RootCubit, RootState>(
+      builder: (context, rootState) {
+        return BlocBuilder<ThemeCubit, ThemeState>(
+          builder: (context, themeState) {
+            Widget home = const SplashScreen();
+
+            if (rootState is Authenticated) {
+              home = const HomeScreen();
+            } else if (rootState is Unauthenticated) {
+              home = const SignInScreen();
+            }
+
+            return PlatformApp(
+              themeMode: BlocProvider.of<ThemeCubit>(context).currentTheme,
+              routes: {
+                Routes.signIn: (context) => const SignInScreen(),
+                Routes.signUp: (context) => const SignUpScreen(),
+                Routes.home: (context) => const HomeScreen(),
+                Routes.setting: (context) => const SettingScreen(),
+                Routes.detail: (context) => const DetailScreen(),
+              },
+              home: home,
+            );
+          },
+        );
       },
     );
   }

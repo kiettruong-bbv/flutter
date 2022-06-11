@@ -1,7 +1,10 @@
+import 'package:expense_notes/bloc/theme/theme_cubit.dart';
 import 'package:expense_notes/extension/date_extension.dart';
 import 'package:expense_notes/extension/platform_extension.dart';
+import 'package:expense_notes/style/my_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 typedef DatePickerCallback = Function(DateTime? dateTime);
 
@@ -63,6 +66,31 @@ class _DateTimeInputState extends State<DateTimeInput> {
       initialDate: selectedDate,
       firstDate: DateTime(2020, 8),
       lastDate: DateTime.now(),
+      builder: (context, child) {
+        final ThemeMode themeMode =
+            BlocProvider.of<ThemeCubit>(context).currentTheme;
+
+        if (themeMode == ThemeMode.light) {
+          return Theme(
+            data: ThemeData.light().copyWith(
+              colorScheme: const ColorScheme.light(
+                primary: MyColors.purple,
+              ),
+            ),
+            child: child!,
+          );
+        } else if (themeMode == ThemeMode.dark) {
+          return Theme(
+            data: ThemeData.dark().copyWith(
+              colorScheme: const ColorScheme.dark(
+                primary: MyColors.lightPurple,
+              ),
+            ),
+            child: child!,
+          );
+        }
+        return child!;
+      },
     );
     if (picked != null && picked != selectedDate) {
       setState(() {

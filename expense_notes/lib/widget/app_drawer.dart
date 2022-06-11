@@ -1,13 +1,10 @@
-import 'dart:convert';
-
-import 'package:expense_notes/constants/storage_key.dart';
-import 'package:expense_notes/model/auth_model.dart';
-import 'package:expense_notes/model/auth_response.dart';
+import 'package:expense_notes/bloc/expense/expense_list_cubit.dart';
+import 'package:expense_notes/bloc/root/root_cubit.dart';
+import 'package:expense_notes/bloc/theme/theme_cubit.dart';
 import 'package:expense_notes/routes.dart';
-import 'package:expense_notes/utils/storage_utils.dart';
 import 'package:expense_notes/widget/platform_widget/platform_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum Section { home, settings, logout }
 
@@ -24,15 +21,6 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
-  late final AuthResponse _auth;
-
-  @override
-  void initState() {
-    final String authData = StorageUtils.getItem(StorageKey.auth);
-    _auth = AuthResponse.fromJson(jsonDecode(authData));
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     PlatformTheme theme = PlatformTheme(context);
@@ -56,12 +44,6 @@ class _AppDrawerState extends State<AppDrawer> {
                   ),
                   const SizedBox(
                     height: 20,
-                  ),
-                  Text(
-                    _auth.email,
-                    style: const TextStyle(
-                      color: Colors.white,
-                    ),
                   ),
                 ],
               ),
@@ -126,6 +108,8 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Future _signOutUser(BuildContext context) async {
-    context.read<AuthModel>().signOut(context);
+    await BlocProvider.of<RootCubit>(context).signOut();
+    BlocProvider.of<ExpenseListCubit>(context).clearLocalData();
+    BlocProvider.of<ThemeCubit>(context).toggleTheme(ThemeMode.light);
   }
 }

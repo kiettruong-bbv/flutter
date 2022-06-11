@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:expense_notes/api/auth_api.dart';
-import 'package:expense_notes/model/auth_response.dart';
+import 'package:expense_notes/constants/storage_key.dart';
+import 'package:expense_notes/model/auth.dart';
 import 'package:expense_notes/services/dio_exceptions.dart';
+import 'package:expense_notes/utils/storage_utils.dart';
 
 abstract class IAuthRepository {
   Future<AuthResponse?> signIn({
@@ -11,6 +15,9 @@ abstract class IAuthRepository {
   Future<AuthResponse?> signUp({
     required String email,
     required String password,
+  });
+  Future storeAuthInfo({
+    required AuthResponse authResponse,
   });
 }
 
@@ -57,5 +64,13 @@ class HttpAuthRepository implements IAuthRepository {
       throw errorMessage;
     }
     return null;
+  }
+
+  @override
+  Future storeAuthInfo({required AuthResponse authResponse}) async {
+    await StorageUtils.setItem(
+      StorageKey.auth,
+      jsonEncode(authResponse.toJson()),
+    );
   }
 }

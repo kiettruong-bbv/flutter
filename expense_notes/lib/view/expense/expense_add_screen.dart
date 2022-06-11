@@ -1,3 +1,5 @@
+import 'package:expense_notes/bloc/expense/expense_list_cubit.dart';
+import 'package:expense_notes/bloc/expense/expense_list_state.dart';
 import 'package:expense_notes/extension/platform_extension.dart';
 import 'package:expense_notes/style/my_colors.dart';
 import 'package:expense_notes/widget/platform_widget/platform_button.dart';
@@ -5,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/expense.dart';
 import 'package:expense_notes/widget/date_time_input.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum Mode { add, edit }
 
@@ -51,7 +54,6 @@ class _AddExpenseState extends State<AddExpense> {
   void dispose() {
     _nameController.dispose();
     _priceController.dispose();
-
     super.dispose();
   }
 
@@ -180,17 +182,21 @@ class _AddExpenseState extends State<AddExpense> {
 
           const Spacer(),
 
-          SizedBox(
-            width: double.infinity,
-            child: PlatformButton(
-              onPressed: _isSubmitEnable ? _submitExpense : null,
-              child: Text(
-                _isEditing ? 'EDIT' : 'ADD',
-                style: buttonTextStyle?.copyWith(
-                  color: Colors.white,
+          BlocBuilder<ExpenseListCubit, ExpenseListState>(
+            builder: (context, state) {
+              final bool isLoading =
+                  state.status == ExpenseListStatus.listLoading;
+              return SizedBox(
+                width: double.infinity,
+                child: PlatformButton(
+                  isLoading: isLoading,
+                  onPressed: _isSubmitEnable ? _submitExpense : null,
+                  child: Text(
+                    _isEditing ? 'EDIT' : 'ADD',
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ],
       ),

@@ -1,14 +1,15 @@
+import 'package:expense_notes/bloc/chart/chart_cubit.dart';
+import 'package:expense_notes/bloc/expense/expense_list_cubit.dart';
 import 'package:expense_notes/extension/platform_extension.dart';
-import 'package:expense_notes/model/chart_model.dart';
-import 'package:expense_notes/model/expense_model.dart';
 import 'package:expense_notes/view/expense/expense_add_screen.dart';
 import 'package:expense_notes/view/expense/expense_chart_screen.dart';
 import 'package:expense_notes/view/expense/expense_list_screen.dart';
 import 'package:expense_notes/widget/app_drawer.dart';
+import 'package:expense_notes/widget/my_loader.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_notes/model/expense.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -19,11 +20,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future _initFuture;
+  late ExpenseListCubit _expenseListCubit;
+  late ChartCubit _chartCubit;
 
   @override
   void initState() {
-    super.initState();
+    _expenseListCubit = BlocProvider.of<ExpenseListCubit>(context);
+    _chartCubit = BlocProvider.of<ChartCubit>(context);
     _initFuture = _initData();
+    super.initState();
   }
 
   @override
@@ -70,9 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
           future: _initFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const MyLoader();
             }
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -138,29 +141,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future _initData() async {
-    ExpenseModel expenseModel = context.read<ExpenseModel>();
-    List<Expense> expenses = await expenseModel.getAll();
+    await _expenseListCubit.getAll();
+    List<Expense> expenses = _expenseListCubit.getExpenses();
 
-    ChartModel chartModel = context.read<ChartModel>();
-    chartModel.sortWeekdayByToday();
-    chartModel.initChart(expenses);
-    chartModel.populateChart();
+    _chartCubit.sortWeekdayByToday();
+    _chartCubit.initChart(expenses);
+    _chartCubit.populateChart();
   }
 
   Future _addItem(Expense expense) async {
-    ExpenseModel expenseModel = context.read<ExpenseModel>();
-    await expenseModel.addItem(expense);
-
-    ChartModel chartModel = context.read<ChartModel>();
-    chartModel.addChart(expense);
+    await _expenseListCubit.addItem(expense);
+    _chartCubit.addChart(expense);
   }
 
   Future _deleteItem(int index, Expense expense) async {
-    ExpenseModel expenseModel = context.read<ExpenseModel>();
-    final deletedItem = await expenseModel.deleteItem(index, expense);
-
-    ChartModel chartModel = context.read<ChartModel>();
-    chartModel.deleteChart(deletedItem);
+    await _expenseListCubit.deleteItem(index, expense);
+    _chartCubit.deleteChart(expense);
   }
 
   Future _editItem(
@@ -168,11 +164,8 @@ class _HomeScreenState extends State<HomeScreen> {
     Expense oldTrans,
     Expense newTrans,
   ) async {
-    ExpenseModel expenseModel = context.read<ExpenseModel>();
-    await expenseModel.updateItem(index, newTrans);
-
-    ChartModel chartModel = context.read<ChartModel>();
-    chartModel.updateChart(oldTrans, newTrans);
+    await _expenseListCubit.updateItem(index, newTrans);
+    _chartCubit.updateChart(oldTrans, newTrans);
   }
 
   void _openAddExpense({

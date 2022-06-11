@@ -58,7 +58,7 @@ class MyTheme with ChangeNotifier {
     return ThemeData(
       primaryColor: MyColors.purple,
       primaryColorLight: Colors.white,
-      backgroundColor: MyColors.darkGrey,
+      backgroundColor: Colors.grey.shade800,
       scaffoldBackgroundColor: Colors.grey.shade900,
       unselectedWidgetColor: Colors.white,
       fontFamily: 'Montserrat',
@@ -78,7 +78,7 @@ class MyTheme with ChangeNotifier {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          primary: Colors.white,
+          primary: MyColors.primary,
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -98,20 +98,20 @@ class MyTheme with ChangeNotifier {
 
   static CupertinoThemeData get cupertinoLightTheme {
     return const CupertinoThemeData(
-      primaryColor: MyColors.purple,
+      primaryColor: MyColors.primary,
       primaryContrastingColor: Colors.white,
       scaffoldBackgroundColor: Colors.white,
-      barBackgroundColor: MyColors.purple,
+      barBackgroundColor: Colors.white,
       brightness: Brightness.light,
     );
   }
 
   static CupertinoThemeData get cupertinoDarkTheme {
     return CupertinoThemeData(
-      primaryColor: MyColors.purple,
+      primaryColor: MyColors.primary,
       primaryContrastingColor: Colors.white,
       scaffoldBackgroundColor: Colors.grey.shade900,
-      barBackgroundColor: MyColors.purple,
+      barBackgroundColor: Colors.grey.shade800,
       brightness: Brightness.dark,
     );
   }
