@@ -1,8 +1,11 @@
 import 'package:demo/google_map_view.dart';
-import 'package:demo/open_street_map_view.dart';
+import 'package:flutter_config/flutter_config.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await FlutterConfig.loadEnvVariables();
+
   runApp(const MyApp());
 }
 
@@ -16,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const OpenStreetMapView(),
+      home: const GoogleMapView(),
     );
   }
 }
